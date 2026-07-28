@@ -4,19 +4,34 @@ let globalResizeObserver: ResizeObserver | null = null;
 
 function getGlobalResizeObserver(): ResizeObserver {
     if (!globalResizeObserver) {
+        let pending: ResizeObserverEntry[] = [];
+        let timer: ReturnType<typeof setTimeout> | null = null;
         globalResizeObserver = new ResizeObserver((entries) => {
-            // One delivery can contain rows from several lists. Grouping all callbacks
-            // here lets updateItemSizes flush once per list instead of once per entry.
-            batchItemSizeUpdates(() => {
-                for (const entry of entries) {
-                    const callbacks = callbackMap.get(entry.target);
-                    if (callbacks) {
-                        for (const callback of callbacks) {
-                            callback(entry);
+            // Dispatching synchronously lets a callback resize an observed element while the
+            // browser is still delivering this batch, which surfaces as
+            // "ResizeObserver loop completed with undelivered notifications".
+            // Coalesce every delivery that lands in the same task and flush once, out of band.
+            pending = pending.concat(entries);
+            if (timer !== null) {
+                clearTimeout(timer);
+            }
+            timer = setTimeout(() => {
+                const toProcess = pending;
+                pending = [];
+                timer = null;
+                // One delivery can contain rows from several lists. Grouping all callbacks
+                // here lets updateItemSizes flush once per list instead of once per entry.
+                batchItemSizeUpdates(() => {
+                    for (const entry of toProcess) {
+                        const callbacks = callbackMap.get(entry.target);
+                        if (callbacks) {
+                            for (const callback of callbacks) {
+                                callback(entry);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }, 0);
         });
     }
     return globalResizeObserver;
