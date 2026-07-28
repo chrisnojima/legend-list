@@ -384,10 +384,21 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
         // Initial
         fireLayout();
 
-        // Observe ScrollView size changes
-        const resizeObserver = new ResizeObserver(() => {
-            fireLayout();
-        });
+        // Observe ScrollView size changes. fireLayout can resize the observed element (the list
+        // re-measures and the container grows/shrinks), so firing synchronously inside the delivery
+        // triggers "ResizeObserver loop completed with undelivered notifications". Defer to the next
+        // task and collapse repeat deliveries into a single layout event.
+        let layoutTimer: ReturnType<typeof setTimeout> | null = null;
+        const scheduleLayout = () => {
+            if (layoutTimer !== null) {
+                clearTimeout(layoutTimer);
+            }
+            layoutTimer = setTimeout(() => {
+                layoutTimer = null;
+                fireLayout();
+            }, 0);
+        };
+        const resizeObserver = new ResizeObserver(scheduleLayout);
         resizeObserver.observe(element);
 
         const onWindowResize = () => {
@@ -398,6 +409,9 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
         }
 
         return () => {
+            if (layoutTimer !== null) {
+                clearTimeout(layoutTimer);
+            }
             resizeObserver.disconnect();
             if (isWindowScroll && typeof window !== "undefined" && typeof window.removeEventListener === "function") {
                 window.removeEventListener("resize", onWindowResize);
