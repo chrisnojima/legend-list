@@ -45,6 +45,7 @@ export type LayoutChangeEvent = NativeSyntheticEvent<{ layout: LayoutRectangle }
 export interface ScrollViewMethods {
     getBoundingClientRect(): DOMRect | null | undefined;
     getCurrentScrollOffset(): number;
+    getMaxScrollOffset(): number;
     getScrollableNode(): HTMLElement;
     getScrollEventTarget(): ScrollEventTarget | null;
     getScrollResponder(): HTMLElement | null;
@@ -235,6 +236,7 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
         const api: ScrollViewMethods = {
             getBoundingClientRect: () => scrollRef.current?.getBoundingClientRect(),
             getCurrentScrollOffset,
+            getMaxScrollOffset,
             getScrollableNode: () => resolveScrollableNode(scrollRef.current, isWindowScroll)!,
             getScrollEventTarget: () => getScrollTarget(),
             getScrollResponder: () => resolveScrollableNode(scrollRef.current, isWindowScroll),

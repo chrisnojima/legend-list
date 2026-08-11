@@ -63,15 +63,27 @@ async function flushAsync() {
     });
 }
 
-async function getStateFromRender() {
+async function getContextFromRender() {
     for (let i = 0; i < 5; i++) {
         const handler = lastListProps?.scrollAdjustHandler ?? handlerInstances.at(-1);
         if (handler) {
-            return (handler as any).context.state as StateContext["state"];
+            return (handler as any).context as StateContext;
         }
         await flushAsync();
     }
     throw new Error("scrollAdjustHandler not found after retries");
+}
+
+async function getStateFromRender() {
+    return (await getContextFromRender()).state;
+}
+
+async function flushFrames(count: number) {
+    for (let i = 0; i < count; i++) {
+        await act(async () => {
+            await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
+        });
+    }
 }
 
 beforeEach(() => {
@@ -127,6 +139,67 @@ describe("LegendList imperative scrolls", () => {
                 viewPosition: 1,
             }),
         ]);
+
+        await act(async () => {
+            renderer?.unmount();
+        });
+    });
+
+    it("defers an imperative scroll until the platform scroll extent catches up", async () => {
+        const { LegendList } = await import("../../src/components/LegendList?imperative-scroll-extent");
+        let listRef: LegendListRef | null = null;
+
+        function Harness() {
+            const ref = React.useRef<LegendListRef>(null);
+            listRef = ref.current;
+            return (
+                <LegendList
+                    data={createData(100)}
+                    estimatedItemSize={50}
+                    getFixedItemSize={() => 50}
+                    keyExtractor={(item: { id: string }) => item.id}
+                    recycleItems={false}
+                    ref={(instance: LegendListRef | null) => {
+                        (ref as any).current = instance;
+                        listRef = instance;
+                    }}
+                    renderItem={() => null}
+                />
+            );
+        }
+
+        let renderer: ReturnType<typeof TestRenderer.create> | undefined;
+        await act(async () => {
+            renderer = TestRenderer.create(<Harness />);
+        });
+        const ctx = await getContextFromRender();
+        const state = ctx.state;
+
+        // A scroller whose extent still reflects the pre-data-change content: nothing is
+        // scrollable yet even though the list knows the content is 5000 tall.
+        let platformMaxScrollOffset = 0;
+        state.scrollLength = 300;
+        ctx.values.set("totalSize", 5000);
+        state.refScroller.current = {
+            flashScrollIndicators: () => {},
+            getMaxScrollOffset: () => platformMaxScrollOffset,
+            getScrollableNode: () => ({}) as any,
+            getScrollResponder: () => null,
+            scrollTo: () => {},
+            scrollToEnd: () => {},
+        } as any;
+
+        await act(async () => {
+            void listRef!.scrollToIndex({ animated: false, index: 90 });
+        });
+        await flushFrames(5);
+
+        expect(scrollToIndexCalls).toHaveLength(0);
+
+        platformMaxScrollOffset = 4700;
+        await flushFrames(5);
+
+        expect(scrollToIndexCalls).toEqual([expect.objectContaining({ animated: false, index: 90 })]);
 
         await act(async () => {
             renderer?.unmount();

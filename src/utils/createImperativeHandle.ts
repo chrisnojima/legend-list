@@ -3,6 +3,7 @@ import { settlePendingImperativeScroll } from "@/core/cancelImperativeScroll";
 import { invalidateContainerFixedItemSizes } from "@/core/containerItemMetadata";
 import { supersedeInitialScroll } from "@/core/finishInitialScroll";
 import { retargetActiveInitialScrollAtEnd } from "@/core/initialScrollLifecycle";
+import { isScrollExtentSynced } from "@/core/isScrollExtentSynced";
 import { scheduleContainerLayout } from "@/core/scheduleContainerLayout";
 import { scrollTo } from "@/core/scrollTo";
 import { scrollToEnd } from "@/core/scrollToEnd";
@@ -66,6 +67,10 @@ export function createImperativeHandle(ctx: StateContext, scheduleImperativeScro
         state.scheduledWork.has("mvcpRecalculate") ||
         state.ignoreScrollFromMVCP !== undefined;
 
+    // Every imperative scroll waits on this: the list has to have settled after a data change,
+    // and the platform scroller has to be able to reach what the list thinks is scrollable.
+    const isScrollBlocked = () => isSettlingAfterDataChange() || !isScrollExtentSynced(ctx);
+
     const isScrollToIndexReady = (targetIndex: number, allowEmpty = false) => {
         const props = state.props;
         const dataLength = props.data.length;
@@ -93,7 +98,7 @@ export function createImperativeHandle(ctx: StateContext, scheduleImperativeScro
                 return;
             }
 
-            if (isSettlingAfterDataChange() || !isReady()) {
+            if (isScrollBlocked() || !isReady()) {
                 stableFrames = 0;
             } else {
                 stableFrames += 1;
@@ -126,7 +131,7 @@ export function createImperativeHandle(ctx: StateContext, scheduleImperativeScro
             }
         };
 
-        if (isSettlingAfterDataChange() || !isReady()) {
+        if (isScrollBlocked() || !isReady()) {
             runWhenReady(token, runNow, isReady);
         } else {
             runNow();

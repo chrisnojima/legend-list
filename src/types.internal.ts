@@ -35,6 +35,11 @@ export interface ScrollableNodeLike {
 export interface LegendListScrollerRef {
     flashScrollIndicators(): void;
     getCurrentScrollOffset?(): number;
+    /**
+     * The furthest offset the scroller can currently reach, for platforms that measure it from a
+     * document. Scrollers without a measurable extent leave this undefined.
+     */
+    getMaxScrollOffset?(): number;
     getNativeScrollRef?(): unknown;
     getScrollEventTarget?(): ScrollEventTargetLike | null;
     getScrollableNode(): ScrollableNodeLike | null;
