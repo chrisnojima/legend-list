@@ -9,7 +9,9 @@ export type ScheduledWorkKey =
     | "mvcpRecalculate"
     | "platformScrollCompletion"
     | "preservedInitialScroll"
-    | "renderRangeProjection";
+    | "renderRangeProjection"
+    | "scrollTargetSettle"
+    | "scrollTargetSettleDeadline";
 
 type Work = [handle: any, cancel: (handle: any) => void];
 

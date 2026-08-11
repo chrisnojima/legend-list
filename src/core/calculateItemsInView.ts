@@ -7,6 +7,7 @@ import { handleInitialScrollLayoutReady } from "@/core/initialScrollLifecycle";
 import { prepareMVCP } from "@/core/mvcp";
 import { resetLayoutCachesForDataChange } from "@/core/resetLayoutCachesForDataChange";
 import { scheduleContainerLayout } from "@/core/scheduleContainerLayout";
+import { settleScrollTarget } from "@/core/scrollTargetSettle";
 import { syncMountedContainer } from "@/core/syncMountedContainer";
 import { updateItemPositions } from "@/core/updateItemPositions";
 import { updateViewableItems } from "@/core/viewability";
@@ -529,6 +530,11 @@ export function calculateItemsInView(
         // the new tail instead of the pre-update end-of-list.
         totalSize = getContentSize(ctx);
 
+        // Kept for the settle below, which corrects only when a measurement moved its target. A
+        // data change is not one: what a prepend does to the target's offset is
+        // maintainVisibleContentPosition's business, and treating it as a measurement would have
+        // the settle re-aim on top of whatever MVCP just did.
+        const minIndexSizeChangedThisPass = minIndexSizeChanged;
         if (minIndexSizeChanged !== undefined) {
             // Clear minIndexSizeChanged after using it for position updates
             state.minIndexSizeChanged = undefined;
@@ -554,11 +560,32 @@ export function calculateItemsInView(
         const scrollBeforeMVCP = state.scroll;
         const scrollAdjustPendingBeforeMVCP = peek$(ctx, "scrollAdjustPending") ?? 0;
         checkMVCP?.();
-        const didMVCPAdjustScroll =
+        const scrollAdjustPendingAfterMVCP = peek$(ctx, "scrollAdjustPending") ?? 0;
+        const didMVCPAdjust =
             !!checkMVCP &&
-            (state.scroll !== scrollBeforeMVCP ||
-                (peek$(ctx, "scrollAdjustPending") ?? 0) !== scrollAdjustPendingBeforeMVCP);
-        if (didMVCPAdjustScroll) {
+            (state.scroll !== scrollBeforeMVCP || scrollAdjustPendingAfterMVCP !== scrollAdjustPendingBeforeMVCP);
+        // Runs after positions have been updated, so it sees where the target actually ended up once
+        // this pass's measurements were folded in. It stands down on any pass that MVCP adjusted, or
+        // that still has an adjustment queued for the platform, so the two never correct the same
+        // movement twice.
+        // pendingNativeMVCPAdjust means native MVCP is mid-flight: the platform is moving the
+        // scroll and state.scroll is deliberately out of sync, so the error measured here would be
+        // meaningless and a correction would corrupt how that adjustment measures its own progress.
+        const mvcp = state.props.maintainVisibleContentPosition;
+        // A data change nobody anchored across. prepareMVCP only holds position across a data change
+        // when maintainVisibleContentPosition.data is on, so without it every position is rebuilt
+        // from the start of the list and the target moves with no item having measured and nothing
+        // compensating. That is a move worth re-aiming at, and it cannot put two controllers on the
+        // scroll position, because on this pass the other one did nothing at all.
+        const isUnanchoredDataChange = dataChanged && !mvcp.data;
+        const isCompensating = didMVCPAdjust || scrollAdjustPendingAfterMVCP !== 0 || !!state.pendingNativeMVCPAdjust;
+        if (!suppressInitialScrollSideEffects) {
+            settleScrollTarget(ctx, {
+                isCompensating,
+                minIndexSizeChanged: isUnanchoredDataChange ? 0 : minIndexSizeChangedThisPass,
+            });
+        }
+        if (didMVCPAdjust) {
             updateScroll(state.scroll);
             updateScrollRange();
         }

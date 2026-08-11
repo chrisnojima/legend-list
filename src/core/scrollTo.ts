@@ -3,6 +3,7 @@ import { cancelScrollCompletionChecks } from "@/core/cancelImperativeScroll";
 import { clampScrollOffset } from "@/core/clampScrollOffset";
 import { doScrollTo } from "@/core/doScrollTo";
 import { initialScrollCompletion, initialScrollWatchdog } from "@/core/initialScrollSession";
+import { beginScrollTargetSettle, clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import { updateScroll } from "@/core/updateScroll";
 import { Platform } from "@/platform/Platform";
 import type { StateContext } from "@/state/state";
@@ -187,6 +188,10 @@ export function scrollTo(
     if (!noScrollingTo) {
         if (isInitialScroll) {
             initialScrollCompletion.resetFlags(state);
+            // The initial scroll owns the position from here, and it re-resolves itself as items
+            // measure through its own path. A target still being held from an earlier request would
+            // now be paired with this scroll's `scrollingTo` and correct against it.
+            clearScrollTargetSettle(state);
         }
         const averageSizeSnapshot = getAverageSizeSnapshot(state);
         state.scrollingTo = {
@@ -197,6 +202,19 @@ export function scrollTo(
         };
         if (!isInitialScroll) {
             pinScrollTargetRenderRange(ctx, targetOffset, scrollTarget.index);
+            // Items above an index target may still be estimates, so the offset resolved here can
+            // stop satisfying the request as they measure. Hold the target until it stops moving.
+            // Animated scrolls are excluded: the platform owns the scroll position for the length
+            // of the animation, so re-aiming would replace it with a jump.
+            if (!animated && scrollTarget.index !== undefined && scrollTarget.viewPosition !== undefined) {
+                beginScrollTargetSettle(ctx, {
+                    index: scrollTarget.index,
+                    viewOffset: scrollTarget.viewOffset ?? 0,
+                    viewPosition: scrollTarget.viewPosition,
+                });
+            } else {
+                clearScrollTargetSettle(state);
+            }
         }
     }
     state.scrollPending = targetOffset;

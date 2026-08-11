@@ -241,6 +241,17 @@ export interface InternalState {
     scrollHistory: Array<{ scroll: number; time: number }>;
     scrollingTo?: InternalScrollTarget | undefined;
     scrollTargetPinnedRange?: { end: number; start: number };
+    /** Active hold on an imperative scroll target while item measurements settle. */
+    scrollTargetSettle?: {
+        corrections: number;
+        deadline: number;
+        id: string;
+        /** Lowest index measured since the last correction, kept until it has been acted on. */
+        measuredIndex: number | undefined;
+        quietPasses: number;
+        viewOffset: number;
+        viewPosition: number;
+    };
     horizontalRTLScrollType?: "normal" | "inverted" | "negative";
     scrollLastCalculate?: number;
     scrollLength: number;

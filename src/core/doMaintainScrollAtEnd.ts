@@ -1,3 +1,4 @@
+import { clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import { getContentSize } from "@/state/getContentSize";
 import { peek$, type StateContext } from "@/state/state";
 import { getLogicalHorizontalMaxOffset, isHorizontalRTL, toNativeHorizontalOffset } from "@/utils/rtl";
@@ -39,6 +40,11 @@ export function doMaintainScrollAtEnd(ctx: StateContext) {
             const activeState = maintainScrollAtEnd.animated ? "animated" : "instant";
             const scrollAtRequest = state.scroll;
             state.maintainingScrollAtEnd = pendingState;
+            // Released as the anchor is requested, not when it scrolls: this drives the scroller
+            // directly rather than going through scrollTo, and a settle correction scheduled in the
+            // same tick could otherwise run first and move the scroll out from under the check
+            // below. The end anchor outranks a settling target.
+            clearScrollTargetSettle(state);
 
             requestAnimationFrame(() => {
                 const isStillWithinThreshold = peek$(ctx, "isWithinMaintainScrollAtEndThreshold");
