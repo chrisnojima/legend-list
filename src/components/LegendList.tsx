@@ -33,6 +33,7 @@ import { onScroll } from "@/core/onScroll";
 import { resetLayoutCachesForDataChange } from "@/core/resetLayoutCachesForDataChange";
 import { ScheduledWork } from "@/core/ScheduledWork";
 import { ScrollAdjustHandler } from "@/core/ScrollAdjustHandler";
+import { clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import { maybeUpdateAnchoredEndSpace } from "@/core/updateAnchoredEndSpace";
 import { updateContentInsetEndAdjustment } from "@/core/updateContentInsetEndAdjustment";
 import { updateContentMetricsState } from "@/core/updateContentMetricsState";
@@ -838,6 +839,9 @@ const LegendListInner = typedForwardRef(function LegendListInner<T>(
             onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => onScroll(ctx, event),
             onScrollBeginDrag: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
                 prepareReachedEdgeForNextUserScroll(ctx);
+                // The user taking hold of the list outranks a scroll target still settling; dragging
+                // away from it must not be corrected back.
+                clearScrollTargetSettle(state);
                 state.props.onScrollBeginDrag?.(event as any);
             },
             onScrollEnd: () => prepareReachedEdgeForNextUserScroll(ctx),

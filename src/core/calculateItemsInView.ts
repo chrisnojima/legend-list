@@ -7,6 +7,7 @@ import { handleInitialScrollLayoutReady } from "@/core/initialScrollLifecycle";
 import { prepareMVCP } from "@/core/mvcp";
 import { resetLayoutCachesForDataChange } from "@/core/resetLayoutCachesForDataChange";
 import { scheduleContainerLayout } from "@/core/scheduleContainerLayout";
+import { settleScrollTarget } from "@/core/scrollTargetSettle";
 import { syncMountedContainer } from "@/core/syncMountedContainer";
 import { updateItemPositions } from "@/core/updateItemPositions";
 import { updateViewableItems } from "@/core/viewability";
@@ -554,10 +555,18 @@ export function calculateItemsInView(
         const scrollBeforeMVCP = state.scroll;
         const scrollAdjustPendingBeforeMVCP = peek$(ctx, "scrollAdjustPending") ?? 0;
         checkMVCP?.();
-        const didMVCPAdjustScroll =
+        const scrollAdjustPendingAfterMVCP = peek$(ctx, "scrollAdjustPending") ?? 0;
+        const didMVCPAdjust =
             !!checkMVCP &&
-            (state.scroll !== scrollBeforeMVCP ||
-                (peek$(ctx, "scrollAdjustPending") ?? 0) !== scrollAdjustPendingBeforeMVCP);
+            (state.scroll !== scrollBeforeMVCP || scrollAdjustPendingAfterMVCP !== scrollAdjustPendingBeforeMVCP);
+        // Runs after positions have been updated, so it sees where the target actually ended up once
+        // this pass's measurements were folded in. It stands down on any pass that MVCP adjusted, or
+        // that still has an adjustment queued for the platform, so the two never correct the same
+        // movement twice.
+        const didSettleScrollTarget = suppressInitialScrollSideEffects
+            ? false
+            : settleScrollTarget(ctx, didMVCPAdjust || scrollAdjustPendingAfterMVCP !== 0);
+        const didMVCPAdjustScroll = didMVCPAdjust || didSettleScrollTarget;
         if (didMVCPAdjustScroll) {
             updateScroll(state.scroll);
             updateScrollRange();
