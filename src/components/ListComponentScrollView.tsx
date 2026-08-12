@@ -93,6 +93,11 @@ interface ExtraPropsFromRN {
 
 const SCROLLBAR_HIDDEN_STYLE_ID = "legend-list-scrollbar-axis-hidden-style";
 const SCROLL_END_FALLBACK_MS = 200;
+// Slack for comparing a measured document extent against a computed offset.
+const SCROLL_EXTENT_EPSILON = 1;
+// How many frames a scroll may wait for the content it was aimed at to commit. Generous enough to
+// cover a slow commit, bounded so a request the content never grows to reach gives up.
+const REACHABLE_RETRY_FRAMES = 30;
 const SCROLLBAR_HIDDEN_STYLE = `.${LEGEND_LIST_SCROLLBAR_Y_HIDDEN_CLASS}::-webkit-scrollbar:vertical{width:0;display:none;}.${LEGEND_LIST_SCROLLBAR_X_HIDDEN_CLASS}::-webkit-scrollbar:horizontal{height:0;display:none;}`;
 
 function ensureScrollbarHiddenStyle() {
@@ -196,6 +201,51 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
         return horizontal ? scrollElement.scrollLeft : scrollElement.scrollTop;
     }, [getMaxScrollOffset, horizontal, isWindowScroll]);
 
+    // The scroll extent is measured from the document, which lags a React commit: for a frame after
+    // the content changes size the element still reports its previous extent, so a scroll issued in
+    // that window is clamped to somewhere short of the request - often to 0 - and the caller has no
+    // way to know. Re-issue it on later frames until the content the request was resolved against
+    // has committed, bounded so a request the content never grows to reach cannot retry forever.
+    //
+    // Deliberately not gated on how far the request reaches. The offset is resolved from positions
+    // that include estimates, so it can legitimately sit past the list's own totalSize while the DOM
+    // extent it would be compared against is still 0 in the same frame. Measured on a chat thread
+    // jumping to a search hit: offset 9047, committed extent 0.
+    const reissueHandleRef = useRef(0);
+    const scrollUntilReachable = useCallback(
+        (offset: number, animated: boolean, run: (reachableOffset: number) => void) => {
+            cancelAnimationFrame(reissueHandleRef.current);
+            let attempts = 0;
+            let previousMaxOffset = Number.NEGATIVE_INFINITY;
+            const attempt = () => {
+                const liveMaxOffset = getMaxScrollOffset();
+                run(clampOffset(offset, liveMaxOffset));
+                // Waiting is only worth anything while the content is still growing towards the
+                // request. An extent that has stopped moving is the list saying this is all there
+                // is - a page-down at the end of a list asks past the end every time, and retrying
+                // that would scroll on top of the user for the length of the budget. The frame
+                // count stays as a backstop for content that grows without pause.
+                const isStillCommitting = liveMaxOffset > previousMaxOffset;
+                previousMaxOffset = liveMaxOffset;
+                // An animated scroll is left alone: re-issuing a smooth scroll restarts its
+                // animation every frame, which is worse than landing short.
+                if (
+                    !animated &&
+                    isStillCommitting &&
+                    Number.isFinite(offset) &&
+                    offset - liveMaxOffset > SCROLL_EXTENT_EPSILON &&
+                    ++attempts < REACHABLE_RETRY_FRAMES
+                ) {
+                    reissueHandleRef.current = requestAnimationFrame(attempt);
+                }
+            };
+            attempt();
+        },
+        [getMaxScrollOffset],
+    );
+
+    useEffect(() => () => cancelAnimationFrame(reissueHandleRef.current), []);
+
     const scrollToLocalOffset = useCallback(
         (offset: number, animated: boolean) => {
             const scrollElement = scrollRef.current;
@@ -204,31 +254,36 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
                 return;
             }
 
-            const maxOffset = getMaxScrollOffset();
-            const clampedOffset = clampOffset(offset, maxOffset);
             const behavior = animated ? "smooth" : "auto";
             const options: ScrollToOptions = { behavior };
 
             if (isWindowScroll) {
+                // The document, not this element, owns the extent here, so there is nothing local to
+                // wait for: resolve against the window and issue it once.
                 const scroll = getWindowScrollPosition();
                 const listPos = getElementDocumentPosition(scrollElement, scroll);
                 const { left, top } = resolveWindowScrollTarget({
-                    clampedOffset,
+                    clampedOffset: clampOffset(offset, getMaxScrollOffset()),
                     horizontal,
                     listPos,
                     scroll,
                 });
                 options.left = left;
                 options.top = top;
-            } else if (horizontal) {
-                options.left = clampedOffset;
-            } else {
-                options.top = clampedOffset;
+                target.scrollTo(options);
+                return;
             }
 
-            target.scrollTo(options);
+            scrollUntilReachable(offset, animated, (reachableOffset) => {
+                if (horizontal) {
+                    options.left = reachableOffset;
+                } else {
+                    options.top = reachableOffset;
+                }
+                target.scrollTo(options);
+            });
         },
-        [getMaxScrollOffset, getScrollTarget, horizontal, isWindowScroll],
+        [getMaxScrollOffset, getScrollTarget, horizontal, isWindowScroll, scrollUntilReachable],
     );
 
     useImperativeHandle(ref, () => {
@@ -252,8 +307,9 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
             },
             scrollToEnd: (options: { animated?: boolean } = {}) => {
                 const { animated = true } = options;
-                const endOffset = getMaxScrollOffset();
-                scrollToLocalOffset(endOffset, animated);
+                // Deliberately the committed end: room borrowed by a scroll still in flight is not
+                // content to scroll to.
+                scrollToLocalOffset(getMaxScrollOffset(), animated);
             },
             scrollToOffset: (params: { offset: number; animated?: boolean }) => {
                 const { offset, animated = true } = params;
