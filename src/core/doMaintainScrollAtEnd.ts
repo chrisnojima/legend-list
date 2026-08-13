@@ -1,3 +1,4 @@
+import { EDGE_POSITION_EPSILON } from "@/constants";
 import { clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import { getContentSize } from "@/state/getContentSize";
 import { peek$, type StateContext } from "@/state/state";
@@ -48,7 +49,16 @@ export function doMaintainScrollAtEnd(ctx: StateContext) {
 
             requestAnimationFrame(() => {
                 const isStillWithinThreshold = peek$(ctx, "isWithinMaintainScrollAtEndThreshold");
-                const didScrollSinceRequest = state.scroll !== scrollAtRequest;
+                // A scroll the list issued is still settling a frame later, and on web it can be
+                // re-issued against a larger extent, so the position a request read when it was made
+                // is not the position it finds here - four frames of a thread opening moved through
+                // 6104, 5930, 6020 and 6005 without the reader touching anything. Drift onto the
+                // offset the platform was last told to go to is that settling; drift anywhere else is
+                // the reader taking hold, and only that gives up the end.
+                const lastIssued = state.lastIssuedScrollOffset;
+                const isSettlingOntoIssuedScroll =
+                    lastIssued !== undefined && Math.abs(state.scroll - lastIssued) <= EDGE_POSITION_EPSILON;
+                const didScrollSinceRequest = state.scroll !== scrollAtRequest && !isSettlingOntoIssuedScroll;
 
                 // Layout and content changes can move the end beyond the threshold while this request is pending.
                 // Keep the original end anchor unless the scroll position changed in the meantime.

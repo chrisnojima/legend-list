@@ -270,6 +270,7 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
                 });
                 options.left = left;
                 options.top = top;
+                ctx.state.lastIssuedScrollOffset = clampOffset(offset, getMaxScrollOffset());
                 target.scrollTo(options);
                 return;
             }
@@ -280,10 +281,14 @@ export const ListComponentScrollView = forwardRef(function ListComponentScrollVi
                 } else {
                     options.top = reachableOffset;
                 }
+                // Recorded after the clamp, so it is where the list will actually come to rest and
+                // not what was asked for. doMaintainScrollAtEnd compares against it to tell a scroll
+                // it issued from one the reader made.
+                ctx.state.lastIssuedScrollOffset = reachableOffset;
                 target.scrollTo(options);
             });
         },
-        [getMaxScrollOffset, getScrollTarget, horizontal, isWindowScroll, scrollUntilReachable],
+        [ctx, getMaxScrollOffset, getScrollTarget, horizontal, isWindowScroll, scrollUntilReachable],
     );
 
     useImperativeHandle(ref, () => {

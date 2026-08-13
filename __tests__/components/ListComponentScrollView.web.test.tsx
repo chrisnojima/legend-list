@@ -126,6 +126,7 @@ function resetMocks() {
     mockCtx.state.props.anchoredEndSpace = undefined;
     mockCtx.state.props.contentInsetEndAdjustment = undefined;
     mockCtx.state.scrollingTo = undefined;
+    mockCtx.state.lastIssuedScrollOffset = undefined;
 }
 
 describe("ListComponentScrollView (web)", () => {
@@ -956,6 +957,32 @@ describe("ListComponentScrollView (web)", () => {
                 // The request, then one frame that finds the extent unmoved. No more.
                 expect(scrollToCalls).toHaveLength(2);
                 expect(scrollToCalls.every((call) => call.top === 500)).toBe(true);
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("records where each issue actually landed, not what it asked for", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-records-issued");
+
+            try {
+                // doMaintainScrollAtEnd reads this to tell a scroll the list issued from one the
+                // reader made, so it has to be the clamped offset the list will come to rest on.
+                liveMaxOffset = 500;
+                act(() => {
+                    ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+                });
+
+                expect(mockCtx.state.lastIssuedScrollOffset).toBe(500);
+
+                liveMaxOffset = 900;
+                runFrame();
+
+                expect(mockCtx.state.lastIssuedScrollOffset).toBe(900);
             } finally {
                 act(() => {
                     renderer?.unmount();

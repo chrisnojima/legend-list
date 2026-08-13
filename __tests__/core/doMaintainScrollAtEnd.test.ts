@@ -454,6 +454,51 @@ describe("doMaintainScrollAtEnd", () => {
             expect(mockState.pendingMaintainScrollAtEnd).toBe(false);
         });
 
+        it("keeps a coalesced request when the drift is a scroll the list itself issued", () => {
+            // Measured in the desktop app opening a thread whose rows grow a frame after it lands.
+            // The anchor's scroll was re-issued against the committed extent and landed on 6005; the
+            // request that followed read the scroll as 6020 while that was still settling, and by its
+            // frame the content had grown to 7224, which puts the list 432px from the end and outside
+            // the threshold. Nothing about that was the reader, so the anchor has to keep its claim.
+            mockState.scrollLength = 787;
+            mockState.scroll = 6020;
+            mockState.lastIssuedScrollOffset = 6005;
+            mockCtx.values.set("totalSize", 7224);
+            mockState.totalSize = 7224;
+
+            expect(runMaintainScrollAtEnd(false)).toBe(true);
+            runMaintainScrollAtEnd(false);
+            expect(mockState.pendingMaintainScrollAtEnd).toBe(true);
+
+            mockState.scroll = 6005;
+            mockState.isWithinMaintainScrollAtEndThreshold = false;
+            rafCallback?.();
+
+            expect(mockScrollToEnd).toHaveBeenCalledWith({ animated: false });
+            expect(mockState.maintainingScrollAtEnd).toBe("instant");
+        });
+
+        it("gives up the end when the drift is not a scroll the list issued", () => {
+            // The same shape as above with the reader in it: the list sits somewhere it was never
+            // told to go, so the end anchor stands down rather than pulling the reader back.
+            mockState.scrollLength = 787;
+            mockState.scroll = 6020;
+            mockState.lastIssuedScrollOffset = 6005;
+            mockCtx.values.set("totalSize", 7224);
+            mockState.totalSize = 7224;
+
+            expect(runMaintainScrollAtEnd(false)).toBe(true);
+            runMaintainScrollAtEnd(false);
+
+            mockState.scroll = 4200;
+            mockState.isWithinMaintainScrollAtEndThreshold = false;
+            rafCallback?.();
+
+            expect(mockScrollToEnd).not.toHaveBeenCalled();
+            expect(mockState.maintainingScrollAtEnd).toBeUndefined();
+            expect(mockState.pendingMaintainScrollAtEnd).toBe(false);
+        });
+
         it("replays a maintain request that arrives while an instant maintain is active", () => {
             const firstResult = runMaintainScrollAtEnd(false);
 

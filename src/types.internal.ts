@@ -55,6 +55,7 @@ export interface MaintainScrollAtEndNormalized {
     onItemLayout: boolean;
     onDataChange: boolean;
     onFooterLayout: boolean;
+    onHeaderLayout: boolean;
 }
 
 export interface ThresholdSnapshot {
@@ -256,6 +257,11 @@ export interface InternalState {
     scrollLastCalculate?: number;
     scrollLength: number;
     scrollPending: number;
+    /**
+     * The offset the platform was last told to scroll to, after any clamp the platform applied.
+     * The end anchor reads it to tell its own scroll settling from the reader taking hold.
+     */
+    lastIssuedScrollOffset?: number;
     scrollPrev: number;
     scrollPrevTime: number;
     scrollProcessingEnabled: boolean;
