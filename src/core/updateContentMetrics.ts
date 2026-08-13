@@ -2,6 +2,7 @@ import { Platform } from "@/platform/Platform";
 import { peek$, type StateContext, set$ } from "@/state/state";
 import type { Insets } from "@/types.base";
 import { requestAdjust } from "@/utils/requestAdjust";
+import { doMaintainScrollAtEnd } from "./doMaintainScrollAtEnd";
 import { maybeUpdateAnchoredEndSpace } from "./updateAnchoredEndSpace";
 import { updateContentMetricsState } from "./updateContentMetricsState";
 
@@ -50,6 +51,13 @@ export function setHeaderSize(ctx: StateContext, size: number) {
         // is a real content shift above the viewport and should preserve MVCP.
         if (hasMeasuredOrEstimatedHeaderBaseline && shouldAdjustForHeaderSizeChange(ctx, previousHeaderSize, size)) {
             requestAdjust(ctx, size - previousHeaderSize);
+        } else if (state.props.maintainScrollAtEnd?.onHeaderLayout) {
+            // Nothing compensated the shift - MVCP does not anchor sizes, or an initial scroll is
+            // still in flight, which is exactly when a header measures for the first time. Everything
+            // below the header just moved down by the difference, so a list that had reached its end
+            // is now short of it and has to follow. doMaintainScrollAtEnd stands down on its own when
+            // the reader is not at the end.
+            doMaintainScrollAtEnd(ctx);
         }
     }
 

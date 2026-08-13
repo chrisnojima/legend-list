@@ -1,3 +1,5 @@
+import { EDGE_POSITION_EPSILON } from "@/constants";
+import { clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import { getContentSize } from "@/state/getContentSize";
 import { peek$, type StateContext } from "@/state/state";
 import { getLogicalHorizontalMaxOffset, isHorizontalRTL, toNativeHorizontalOffset } from "@/utils/rtl";
@@ -39,10 +41,24 @@ export function doMaintainScrollAtEnd(ctx: StateContext) {
             const activeState = maintainScrollAtEnd.animated ? "animated" : "instant";
             const scrollAtRequest = state.scroll;
             state.maintainingScrollAtEnd = pendingState;
+            // Released as the anchor is requested, not when it scrolls: this drives the scroller
+            // directly rather than going through scrollTo, and a settle correction scheduled in the
+            // same tick could otherwise run first and move the scroll out from under the check
+            // below. The end anchor outranks a settling target.
+            clearScrollTargetSettle(state);
 
             requestAnimationFrame(() => {
                 const isStillWithinThreshold = peek$(ctx, "isWithinMaintainScrollAtEndThreshold");
-                const didScrollSinceRequest = state.scroll !== scrollAtRequest;
+                // A scroll the list issued is still settling a frame later, and on web it can be
+                // re-issued against a larger extent, so the position a request read when it was made
+                // is not the position it finds here - four frames of a thread opening moved through
+                // 6104, 5930, 6020 and 6005 without the reader touching anything. Drift onto the
+                // offset the platform was last told to go to is that settling; drift anywhere else is
+                // the reader taking hold, and only that gives up the end.
+                const lastIssued = state.lastIssuedScrollOffset;
+                const isSettlingOntoIssuedScroll =
+                    lastIssued !== undefined && Math.abs(state.scroll - lastIssued) <= EDGE_POSITION_EPSILON;
+                const didScrollSinceRequest = state.scroll !== scrollAtRequest && !isSettlingOntoIssuedScroll;
 
                 // Layout and content changes can move the end beyond the threshold while this request is pending.
                 // Keep the original end anchor unless the scroll position changed in the meantime.

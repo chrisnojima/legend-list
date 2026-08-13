@@ -1650,4 +1650,36 @@ describe("LegendList props behavior", () => {
 
         rendered.unmount();
     });
+
+    it("releases a settling scroll target when the user grabs the list", async () => {
+        const { LegendList } = await import("../../src/components/LegendList?props-test-drag-releases-settle");
+        const data = [{ id: "item-1", label: "Alpha" }];
+        const renderItem = ({ item }: { item: { label: string } }) => <Text>{item.label}</Text>;
+        render(
+            <LegendList
+                data={data}
+                estimatedItemSize={100}
+                keyExtractor={(item: { id: string }) => item.id}
+                recycleItems={false}
+                renderItem={renderItem}
+            />,
+        );
+
+        const state = (handlerInstances.at(-1) as any).context.state;
+        state.scrollTargetSettle = {
+            corrections: 0,
+            deadline: Date.now() + 1000,
+            expiresAt: Date.now() + 500,
+            id: "item-1",
+            quietPasses: 0,
+            viewOffset: 0,
+            viewPosition: 0.5,
+        };
+
+        act(() => {
+            lastListProps.onInternalScrollBeginDrag({ nativeEvent: {} });
+        });
+
+        expect(state.scrollTargetSettle).toBeUndefined();
+    });
 });

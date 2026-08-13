@@ -17,6 +17,34 @@ const schedule = mock(() => true);
 const flush = mock(() => {});
 const cancel = mock(() => {});
 let supportsScrollEnd = false;
+// The extent the document reports. Tests that move it model a React commit landing.
+let liveMaxOffset = 0;
+const scrollToCalls: Array<Record<string, unknown>> = [];
+// Frames keyed by id so cancelAnimationFrame really cancels — a stub that ignored the id would
+// report the component leaking a frame it had in fact cancelled.
+const frames = new Map<number, () => void>();
+let nextFrameId = 0;
+function installFrameQueue() {
+    frames.clear();
+    nextFrameId = 0;
+    globalThis.requestAnimationFrame = ((callback: FrameRequestCallback) => {
+        const id = ++nextFrameId;
+        frames.set(id, () => callback(0));
+        return id;
+    }) as typeof requestAnimationFrame;
+    globalThis.cancelAnimationFrame = ((id: number) => {
+        frames.delete(id);
+    }) as typeof cancelAnimationFrame;
+}
+function runFrame() {
+    const queued = [...frames.values()];
+    frames.clear();
+    for (const frame of queued) {
+        act(() => {
+            frame();
+        });
+    }
+}
 const mockCtx = {
     state: {
         anchoredEndSpaceSize: undefined as number | undefined,
@@ -48,12 +76,13 @@ function registerWebScrollMocks() {
     }));
 
     mock.module("../../src/components/webScrollUtils", () => ({
-        clampOffset: (offset: number) => offset,
+        clampOffset: (offset: number, maxOffset: number) =>
+            maxOffset === undefined ? offset : Math.max(0, Math.min(offset, maxOffset)),
         getContentSize: () => ({ height: 0, width: 0 }),
         getElementDocumentPosition: () => ({ left: 0, top: 0 }),
         getLayoutMeasurement: () => ({ height: 0, width: 0 }),
         getLayoutRectangle: () => ({ height: 0, width: 0, x: 0, y: 0 }),
-        getMaxOffset: () => 0,
+        getMaxOffset: () => liveMaxOffset,
         getScrollContentSize: () => ({ height: 0, width: 0 }),
         getWindowScrollPosition: () => ({ x: 0, y: 0 }),
         resolveScrollableNode: () => null,
@@ -61,7 +90,9 @@ function registerWebScrollMocks() {
             const target = {
                 addEventListener,
                 removeEventListener,
+                scrollTo: (options: Record<string, unknown>) => scrollToCalls.push(options),
             } as {
+                scrollTo?: (options: Record<string, unknown>) => void;
                 addEventListener: typeof addEventListener;
                 onscrollend?: null;
                 removeEventListener: typeof removeEventListener;
@@ -84,6 +115,8 @@ function resetMocks() {
     flush.mockClear();
     cancel.mockClear();
     supportsScrollEnd = false;
+    liveMaxOffset = 0;
+    scrollToCalls.length = 0;
     mockCtx.state.anchoredEndSpaceSize = undefined;
     mockCtx.state.dataChangeNeedsScrollUpdate = false;
     mockCtx.state.didFinishInitialScroll = true;
@@ -93,6 +126,7 @@ function resetMocks() {
     mockCtx.state.props.anchoredEndSpace = undefined;
     mockCtx.state.props.contentInsetEndAdjustment = undefined;
     mockCtx.state.scrollingTo = undefined;
+    mockCtx.state.lastIssuedScrollOffset = undefined;
 }
 
 describe("ListComponentScrollView (web)", () => {
@@ -856,5 +890,198 @@ describe("ListComponentScrollView (web)", () => {
                 renderer?.unmount();
             });
         }
+    });
+
+    describe("re-issuing a scroll the extent cannot satisfy", () => {
+        // The extent is read from the document, which lags a React commit: for a frame after the
+        // content changes size the element still reports its previous extent, so a scroll issued in
+        // that window is clamped short and nothing tells the caller. The numbers are the ones
+        // measured in a chat thread jumping to a search hit — offset 9047, committed extent 0.
+        const REQUESTED_OFFSET = 9047;
+        // Mirrors REACHABLE_RETRY_FRAMES in the component.
+        const REACHABLE_RETRY_FRAMES = 30;
+        const COMMITTED_EXTENT = 12000;
+
+        async function renderWithScrollRef(tag: string) {
+            const { ListComponentScrollView } = await import(`../../src/components/ListComponentScrollView?${tag}`);
+            const ref = { current: null as any };
+            let renderer: TestRenderer.ReactTestRenderer | undefined;
+            act(() => {
+                renderer = TestRenderer.create(
+                    <ListComponentScrollView onLayout={() => {}} onScroll={() => {}} ref={ref} style={{}}>
+                        <div />
+                    </ListComponentScrollView>,
+                );
+            });
+            return { ref, renderer };
+        }
+
+        it("lands on the request once the content it was aimed at commits", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-lands");
+
+            try {
+                act(() => {
+                    ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+                });
+                expect(scrollToCalls.at(-1)?.top).toBe(0);
+
+                liveMaxOffset = COMMITTED_EXTENT;
+                runFrame();
+
+                expect(scrollToCalls.at(-1)?.top).toBe(REQUESTED_OFFSET);
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("stops as soon as the extent stops growing", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-stops-when-static");
+
+            try {
+                // A page-down at the end of a list asks past the end every time. Retrying that for
+                // the whole budget would scroll on top of the reader.
+                liveMaxOffset = 500;
+                act(() => {
+                    ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+                });
+                runFrame();
+                runFrame();
+                runFrame();
+
+                // The request, then one frame that finds the extent unmoved. No more.
+                expect(scrollToCalls).toHaveLength(2);
+                expect(scrollToCalls.every((call) => call.top === 500)).toBe(true);
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("records where each issue actually landed, not what it asked for", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-records-issued");
+
+            try {
+                // doMaintainScrollAtEnd reads this to tell a scroll the list issued from one the
+                // reader made, so it has to be the clamped offset the list will come to rest on.
+                liveMaxOffset = 500;
+                act(() => {
+                    ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+                });
+
+                expect(mockCtx.state.lastIssuedScrollOffset).toBe(500);
+
+                liveMaxOffset = 900;
+                runFrame();
+
+                expect(mockCtx.state.lastIssuedScrollOffset).toBe(900);
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("keeps waiting while the content is still committing", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-still-committing");
+
+            try {
+                act(() => {
+                    ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+                });
+                // Content arriving a slice at a time, the way a list mounting rows commits.
+                for (let frame = 0; frame < 5; frame++) {
+                    liveMaxOffset += 3_000;
+                    runFrame();
+                }
+
+                expect(scrollToCalls.at(-1)?.top).toBe(REQUESTED_OFFSET);
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("gives up on a request the content never stops growing towards", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-gives-up");
+
+            try {
+                act(() => {
+                    ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+                });
+                // Growing every frame but never far enough, so only the frame count ends it.
+                for (let frame = 0; frame < 60; frame++) {
+                    liveMaxOffset += 1;
+                    runFrame();
+                }
+
+                // Measured by what it stopped doing rather than by an empty frame queue: React and
+                // other tests schedule frames too, so an empty queue is not this component's to
+                // assert.
+                const issued = scrollToCalls.length;
+                runFrame();
+                runFrame();
+                expect(scrollToCalls).toHaveLength(issued);
+                expect(issued).toBeLessThanOrEqual(REACHABLE_RETRY_FRAMES);
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("leaves an animated scroll to the platform", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-animated");
+
+            try {
+                act(() => {
+                    ref.current.scrollToOffset({ animated: true, offset: REQUESTED_OFFSET });
+                });
+                liveMaxOffset = COMMITTED_EXTENT;
+                runFrame();
+
+                // Re-issuing a smooth scroll restarts its animation every frame, which is worse
+                // than landing short.
+                expect(scrollToCalls).toHaveLength(1);
+                expect(scrollToCalls[0]?.behavior).toBe("smooth");
+            } finally {
+                act(() => {
+                    renderer?.unmount();
+                });
+            }
+        });
+
+        it("stops re-issuing once the view is gone", async () => {
+            resetMocks();
+            installFrameQueue();
+            const { ref, renderer } = await renderWithScrollRef("reissue-unmount");
+            act(() => {
+                ref.current.scrollToOffset({ animated: false, offset: REQUESTED_OFFSET });
+            });
+            const issuedBeforeUnmount = scrollToCalls.length;
+
+            act(() => {
+                renderer?.unmount();
+            });
+            liveMaxOffset = COMMITTED_EXTENT;
+            runFrame();
+
+            expect(scrollToCalls).toHaveLength(issuedBeforeUnmount);
+        });
     });
 });

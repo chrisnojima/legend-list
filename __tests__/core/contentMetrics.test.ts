@@ -1,5 +1,6 @@
 import { describe, expect, it, spyOn } from "bun:test";
 import { clampScrollOffset } from "../../src/core/clampScrollOffset";
+import * as doMaintainScrollAtEndModule from "../../src/core/doMaintainScrollAtEnd";
 import { setContentInsetOverride, setFooterSize, setHeaderSize } from "../../src/core/updateContentMetrics";
 import { updateContentMetricsState } from "../../src/core/updateContentMetricsState";
 import { Platform } from "../../src/platform/Platform";
@@ -369,6 +370,80 @@ describe("updateContentMetrics", () => {
             expect(requestAdjustSpy).not.toHaveBeenCalled();
         } finally {
             requestAdjustSpy.mockRestore();
+            Platform.OS = prevPlatform;
+        }
+    });
+    it("follows the end when a header measures larger than its estimate mid initial scroll", () => {
+        // Measured in the desktop app opening a one-to-one: the list scrolled to the end of 1631px of
+        // content, the header then measured 100 -> 152, and nothing compensated it - MVCP was not
+        // anchoring sizes and the initial scroll was still in flight, which is exactly when a header
+        // first measures. Every message moved down by 52px and the thread sat 52px short of its
+        // newest one.
+        const prevPlatform = Platform.OS;
+        Platform.OS = "web";
+        const maintainSpy = spyOn(doMaintainScrollAtEndModule, "doMaintainScrollAtEnd");
+        const ctx = createMockContext(
+            {
+                headerSize: 100,
+                readyToRender: true,
+                totalSize: 1631,
+            },
+            {
+                didContainersLayout: true,
+                didFinishInitialScroll: false,
+                didMeasureHeader: true,
+                props: {
+                    data: [1],
+                    maintainScrollAtEnd: { on: { headerLayout: true } },
+                    maintainVisibleContentPosition: { data: true, size: false },
+                },
+                scroll: 844,
+                scrollLength: 787,
+                totalSize: 1631,
+            },
+        );
+
+        try {
+            setHeaderSize(ctx, 152);
+
+            expect(maintainSpy).toHaveBeenCalledWith(ctx);
+        } finally {
+            maintainSpy.mockRestore();
+            Platform.OS = prevPlatform;
+        }
+    });
+
+    it("leaves the end alone for a header change the trigger is not asked for", () => {
+        const prevPlatform = Platform.OS;
+        Platform.OS = "web";
+        const maintainSpy = spyOn(doMaintainScrollAtEndModule, "doMaintainScrollAtEnd");
+        const ctx = createMockContext(
+            {
+                headerSize: 100,
+                readyToRender: true,
+                totalSize: 1631,
+            },
+            {
+                didContainersLayout: true,
+                didFinishInitialScroll: false,
+                didMeasureHeader: true,
+                props: {
+                    data: [1],
+                    maintainScrollAtEnd: { on: { itemLayout: true } },
+                    maintainVisibleContentPosition: { data: true, size: false },
+                },
+                scroll: 844,
+                scrollLength: 787,
+                totalSize: 1631,
+            },
+        );
+
+        try {
+            setHeaderSize(ctx, 152);
+
+            expect(maintainSpy).not.toHaveBeenCalled();
+        } finally {
+            maintainSpy.mockRestore();
             Platform.OS = prevPlatform;
         }
     });
