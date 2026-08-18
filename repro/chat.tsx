@@ -94,10 +94,16 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
         if (!wrapper) {
             return null;
         }
-        // The scroller is the first descendant that actually overflows.
+        // "First descendant that overflows" is not enough: a multiline row clips up to ~42
+        // wrapped words inside a fixed-height overflow:hidden div, so a row's own scrollHeight
+        // can exceed its clientHeight too. Requiring the candidate to also contain a row rules
+        // rows themselves out (a row's own [data-msg-id] element is never inside itself) and
+        // rules out any other unrelated overflowing box, leaving only the real scroll container.
+        // querySelectorAll returns document order, so the first qualifying match is also the
+        // outermost one. Do not simplify this back to first-overflowing-element.
         const candidates = wrapper.querySelectorAll<HTMLElement>("*");
         for (const el of Array.from(candidates)) {
-            if (el.scrollHeight - el.clientHeight > 1) {
+            if (el.scrollHeight - el.clientHeight > 1 && el.querySelector("[data-msg-id]")) {
                 return el;
             }
         }
