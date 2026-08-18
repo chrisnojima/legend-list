@@ -1,0 +1,315 @@
+[
+  {
+    "detail": {
+      "name": "hit-two-phase"
+    },
+    "t": 184.29999999701977,
+    "type": "scenario.start"
+  },
+  {
+    "detail": {
+      "id": 500,
+      "viewPosition": 0.5
+    },
+    "t": 209.39999999850988,
+    "type": "scroll.request"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 57,
+      "id": 495
+    },
+    "t": 215.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 106,
+      "id": 496
+    },
+    "t": 215.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 63,
+      "id": 497
+    },
+    "t": 215.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 47,
+      "id": 500
+    },
+    "t": 215.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 131,
+      "id": 498
+    },
+    "t": 217.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 45,
+      "id": 499
+    },
+    "t": 217.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 110,
+      "id": 501
+    },
+    "t": 217.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 60,
+      "id": 502
+    },
+    "t": 217.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 55,
+      "id": 503
+    },
+    "t": 217.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 63,
+      "id": 504
+    },
+    "t": 217.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 30
+    },
+    "t": 219.79999999701977,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 30
+    },
+    "t": 219.79999999701977,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 56,
+      "id": 493
+    },
+    "t": 275.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 44,
+      "id": 494
+    },
+    "t": 275.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 58,
+      "id": 505
+    },
+    "t": 275.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 182,
+      "id": 506
+    },
+    "t": 275.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 61,
+      "id": 507
+    },
+    "t": 275.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 123,
+      "id": 508
+    },
+    "t": 275.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 1134
+    },
+    "t": 276.29999999701977,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 61,
+      "id": 490
+    },
+    "t": 278.6000000014901,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 63,
+      "id": 489
+    },
+    "t": 278.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 294,
+      "id": 491
+    },
+    "t": 278.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 55,
+      "id": 492
+    },
+    "t": 278.69999999552965,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 1134
+    },
+    "t": 279,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 1265
+    },
+    "t": 291.3999999985099,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 1265
+    },
+    "t": 291.3999999985099,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "extra": 40,
+      "id": 491
+    },
+    "t": 430.19999999552965,
+    "type": "row.grew"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 334,
+      "id": 491
+    },
+    "t": 431.5,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 1305
+    },
+    "t": 459,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 1305
+    },
+    "t": 459.19999999552965,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "extra": 60,
+      "id": 491
+    },
+    "t": 679.8999999985099,
+    "type": "row.grew"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 394,
+      "id": 491
+    },
+    "t": 680.6999999955297,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 1365
+    },
+    "t": 710.3999999985099,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 1365
+    },
+    "t": 710.6000000014901,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "corrections": 9,
+      "errPx": 118.3125,
+      "fullyVisible": true,
+      "pass": false,
+      "resetTimedOut": false,
+      "settleMs": 835.1000000014901,
+      "targetMissing": false,
+      "timedOut": false
+    },
+    "t": 1020.1999999955297,
+    "type": "scenario.end"
+  }
+]
