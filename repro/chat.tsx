@@ -156,9 +156,18 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
             setListMountSeq((n) => n + 1);
             return;
         }
+        if (flags.deleteImperativeScroll) {
+            // Variant H: no scrollToItem call, no remount — nothing else changed from control.
+            // The library's own freshData bootstrap (dataKey + initialScrollIndex already being
+            // correct on this commit) is trusted to land the target on its own. scroll.expected
+            // is logged only so corrections() has something to arm against; it triggers no
+            // library call.
+            probe.log("scroll.expected", { id: centeredId, viewPosition: 0.5 });
+            return;
+        }
         probe.log("scroll.request", { id: centeredId, viewPosition: 0.5 });
         void listRef.current?.scrollToItem({ animated: false, item: centeredId, viewPosition: 0.5 });
-    }, [centeredId, datasetKey, flags.remountOnJump, messages, probe, ready]);
+    }, [centeredId, datasetKey, flags.deleteImperativeScroll, flags.remountOnJump, messages, probe, ready]);
 
     const renderItem = React.useCallback(
         ({ item }: { item: number }) => {

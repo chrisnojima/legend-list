@@ -167,4 +167,26 @@ export const SCENARIOS: Scenario[] = [
             return { kind: "at-end" };
         },
     },
+    // Added for Task 8.5's audit round 2: the three existing guards all run with
+    // centeredId === undefined for their whole run, so variant F's remountOnJump branch (which
+    // only fires when centeredId transitions to a defined value on an already-mounted list) is
+    // never reached by any of them — their 30/30 says nothing about the remount mechanism. This
+    // scenario jumps to a hit first (reaching the remount branch under F/G), then leaves the hit
+    // and requires end-anchoring to hold under appends, the same shape send-at-end checks.
+    {
+        name: "hit-then-end-anchor",
+        proves: "jumping to a hit, then returning to a live end-anchored view, keeps appends pinned to the end — exercises the remount branch, not just the always-end-anchored guards",
+        async run(ctx) {
+            await openAtHit(ctx, { partialFirst: false });
+            await ctx.wait(300);
+            ctx.setCentered(undefined);
+            ctx.setMessages(await ctx.backend.loadOlder(SEND_WINDOW_NEWEST_ID + 1, PAGE));
+            ctx.setReady(true);
+            await ctx.wait(200);
+            ctx.appendNewest(1);
+            await ctx.wait(120);
+            ctx.appendNewest(1);
+            return { kind: "at-end" };
+        },
+    },
 ];

@@ -18,6 +18,10 @@ const only = flag("only", undefined);
 const jsonOut = flag("json", undefined);
 const headed = args.includes("--headed");
 const variant = flag("variant", "A");
+// Deliberately captures the first run's event trace for every targeted scenario, pass or fail —
+// the normal first-failure capture only fires on failure, which leaves no committed trace for a
+// scenario a variant makes pass. Used to document mechanism for any variant that flips a verdict.
+const keepLog = args.includes("--keep-log");
 
 // Always rebuild, so a run can never report on a stale bundle.
 const build = spawnSync("bun", [path.join(here, "build.mjs"), `--lib=${lib}`], { encoding: "utf8", stdio: "inherit" });
@@ -79,6 +83,14 @@ for (const name of targets) {
                 JSON.stringify(log, null, 2),
             );
         }
+        if (keepLog && i === 0) {
+            const log = await page.evaluate(() => window.__repro.log());
+            fs.mkdirSync(path.join(here, "results"), { recursive: true });
+            fs.writeFileSync(
+                path.join(here, "results", `${name}-variant-${variant}-trace.json`),
+                JSON.stringify(log, null, 2),
+            );
+        }
     }
 }
 
@@ -110,11 +122,11 @@ const fmtPx = (value, hasFiniteErr) => (hasFiniteErr ? `${value.toFixed(1)}px` :
 const pad = (s, w) => String(s).padEnd(w);
 console.log(`\nlib=${lib}  n=${n}  variant=${variant}\n`);
 console.log(
-    `${pad("scenario", 18)}${pad("pass", 8)}${pad("missing", 9)}${pad("med err", 10)}${pad("p95 err", 10)}${pad("med settle", 12)}corrections`,
+    `${pad("scenario", 22)}${pad("pass", 8)}${pad("missing", 9)}${pad("med err", 10)}${pad("p95 err", 10)}${pad("med settle", 12)}corrections`,
 );
 for (const r of rows) {
     console.log(
-        `${pad(r.name, 18)}${pad(`${r.pass}/${r.total}`, 8)}${pad(r.missing, 9)}${pad(fmtPx(r.medErr, r.hasFiniteErr), 10)}${pad(fmtPx(r.p95Err, r.hasFiniteErr), 10)}${pad(`${r.medSettle.toFixed(0)}ms`, 12)}${r.corrections}`,
+        `${pad(r.name, 22)}${pad(`${r.pass}/${r.total}`, 8)}${pad(r.missing, 9)}${pad(fmtPx(r.medErr, r.hasFiniteErr), 10)}${pad(fmtPx(r.p95Err, r.hasFiniteErr), 10)}${pad(`${r.medSettle.toFixed(0)}ms`, 12)}${r.corrections}`,
     );
 }
 

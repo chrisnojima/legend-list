@@ -60,6 +60,16 @@ export function verdictFor(args: {
 
 const MAX_EVENTS = 2000;
 
+// Every event type that means "a jump has just been asked for, by whatever mechanism" arms
+// correction counting the same way: scroll.request (the imperative scrollToItem path),
+// scroll.remount (variant F/G's remount-carries-initialScrollIndex path), and scroll.expected
+// (variant H's do-nothing-and-let-the-library's-own-freshData-bootstrap-handle-it path, logged
+// for instrumentation only — it triggers no library call). Without this, corrections() is
+// structurally zero for any variant that never emits scroll.request, not because nothing needed
+// correcting but because nothing ever armed the counter. See repro/API-AUDIT.md for the case (F)
+// where an earlier version of this file left corrections silently zero for that reason.
+const ARMING_EVENTS = new Set(["scroll.expected", "scroll.remount", "scroll.request"]);
+
 export class Probe {
     private buffer: ProbeEvent[] = [];
     private correctionCount = 0;
@@ -73,7 +83,7 @@ export class Probe {
         if (this.buffer.length > MAX_EVENTS) {
             this.buffer.shift();
         }
-        if (type === "scroll.request") {
+        if (ARMING_EVENTS.has(type)) {
             this.armed = true;
             this.observationsWhileArmed = 0;
         } else if (type === "scroll.observed" && this.armed) {

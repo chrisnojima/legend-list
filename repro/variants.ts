@@ -2,11 +2,17 @@
 // app.tsx/chat.tsx call the library's public API — src/ is never touched. See
 // repro/API-AUDIT.md for what each variant tests and why.
 
-export type VariantId = "A" | "B" | "C" | "D" | "E" | "F" | "G";
+export type VariantId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
 
-export const VARIANT_IDS: VariantId[] = ["A", "B", "C", "D", "E", "F", "G"];
+export const VARIANT_IDS: VariantId[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
 export interface VariantFlags {
+    // H: delete the imperative scrollToItem effect entirely — no call, no remount, nothing else
+    // changed from control. Isolates whether the redundant imperative call (fired on top of an
+    // already-armed freshData bootstrap; see src/core/initialScrollLifecycle.ts) is what breaks
+    // the four failing scenarios, as distinct from F's remount also changing the live-list vs.
+    // fresh-mount code path.
+    deleteImperativeScroll: boolean;
     // D, E: omit the dataKey prop entirely.
     dropDataKey: boolean;
     // D: omit getItemType entirely.
@@ -26,6 +32,7 @@ export interface VariantFlags {
 }
 
 const BASE: VariantFlags = {
+    deleteImperativeScroll: false,
     dropDataKey: false,
     dropGetItemType: false,
     mvcpBare: false,
@@ -56,9 +63,12 @@ export function resolveVariant(id: VariantId): VariantFlags {
         case "F":
             return { ...BASE, remountOnJump: true };
         case "G":
-            // Filled in after A-F are measured, from whichever single-variable changes helped.
-            // See repro/API-AUDIT.md for what this resolves to and why.
+            // Measured after A-F: F was the only single-variable change that moved any verdict;
+            // combined here with C (no effect alone) to check C doesn't interact badly with F.
+            // See repro/API-AUDIT.md for the result (indistinguishable from F alone).
             return { ...BASE, remountOnJump: true, shouldRestorePosition: true };
+        case "H":
+            return { ...BASE, deleteImperativeScroll: true };
         default:
             return { ...BASE };
     }
