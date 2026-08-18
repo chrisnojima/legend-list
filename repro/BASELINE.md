@@ -3,7 +3,29 @@
 Date: 2026-08-18
 Fork commit measured: `c57aa1faa4c9f96c0835f80ca3f0f8925c89f87a`
 
-Both runs used `bun repro/run.mjs --n=30` in system Chrome (Playwright, `channel: "chrome"`, headless).
+Both runs used `bun repro/run.mjs --only=<scenario> --n=30`, invoked once per scenario (nine
+invocations per lib), in system Chrome (Playwright, `channel: "chrome"`, headless). See
+"Methodology note" below for why per-scenario invocations were used, and for a check that this
+chunked method agrees with a single continuous sweep.
+
+## Pass criterion, and a trap in the raw JSON
+
+A run passes when `fullyVisible && Math.abs(errPx) <= PASS_THRESHOLD_PX` (`repro/probe.ts`). The
+two conditions are independent and a scenario can fail on either alone: stock `hit-two-phase` is
+`fullyVisible: true` in all 30 runs and fails purely on the 118.1px offset, while stock
+`hit-late-images` and fork `hit-prepend` are `fullyVisible: false` in all 30 runs — the row is
+found (in `hit-late-images`'s and `hit-prepend`'s case) but not fully in view, in addition to being
+far from its target offset. The tables below report only the pixel error column; this paragraph is
+the key to reading `fullyVisible` failures that a pixel number alone doesn't show.
+
+**Trap when recomputing statistics from the committed JSON:** when a run has `targetMissing: true`,
+`errPx` is `NaN` at runtime, and `JSON.stringify` serializes `NaN` as `null`. `Math.abs(null)` is
+`0`, not `NaN` — so any recomputation that doesn't explicitly exclude `errPx === null` before
+taking medians or percentiles will silently count every missing-target run as a 0px error. This is
+exactly the bug the (uncommitted) merge script used to build these tables originally had; it was
+found and fixed before this document was finalized, but the trap is inherent to the data format,
+not just that script, so anyone else recomputing from `repro/results/stock.json` or
+`repro/results/fork.json` needs to filter `errPx === null` first.
 
 ## Methodology note
 
@@ -90,14 +112,20 @@ Fork result: **8/9 passing**.
 
 ## `hit-prepend`: the fork changes what fails, not whether it fails
 
-This is the single most useful signal in this document for the next task. On stock 3.3.7,
-`hit-prepend` fails because the target row cannot be found in the DOM at all
-(`targetMissing: true`, 30/30 runs) — there is nothing to measure an offset against. On the fork,
-`hit-prepend` still fails (0/30), but `targetMissing` is now `false` in every run: the target row
-*is* found, and sits a median 3381.7px from where it should be. The current fork fix restores the
-target row's identity — LegendList now knows which row it is and renders it — but not its
-position. That is a different, and narrower, remaining problem than "the fix doesn't work here,"
-and it should shape what Task 9 looks at.
+This is the single most useful signal in this document for the next task. What is measured: on
+stock 3.3.7, `hit-prepend` fails with `targetMissing: true` in 30/30 runs — the oracle cannot find
+the target row's DOM node at all. On the fork, `hit-prepend` still fails (0/30), but
+`targetMissing` is `false` in every run: the target row's DOM node is found, and sits a median
+3381.7px from its requested position. So the observation is: stock never locates the row; the fork
+always locates it, but far from where it should be.
+
+Everything past that is inference, not measurement. One reading — call it a hypothesis for Task 9
+to test, not a conclusion this data establishes — is that the fork fix restores the target row's
+*identity* (LegendList locates and renders the correct row) without restoring its *position*
+(where that row ends up on screen). The harness records DOM presence and pixel offset; it does not
+instrument LegendList's internals, so it cannot itself distinguish "identity fixed, position not"
+from any other internal explanation for the same external symptom. Task 9 should treat this as the
+question to answer, not the answer.
 
 ## Guard sanity check
 
@@ -136,9 +164,20 @@ Two distinct failure shapes appear in this data:
 
 1. **Target row not rendered at all** (`targetMissing: true`): the oracle cannot find the row DOM
    node it is looking for anywhere in the document after the scroll-to-index call settles. This is
-   what stock 3.3.7 does on `hit-prepend` and `page-up` — the scroll lands far enough away
-   (`hit-prepend` involves a prepend that shifts content by roughly 4000px) that the target row is
-   outside the range LegendList has drawn, so there is no element to measure an offset against.
+   what stock 3.3.7 does on `hit-prepend` and `page-up`. `errPx` is `null` for these runs — the
+   artifacts record no landing offset at all, because there is no located row to measure one
+   against.
+
+   What is independently verifiable: the `scroll.observed` events recorded in
+   `repro/results/hit-prepend-first-failure.json` (captured from a stock run) show the scroller's
+   `scrollTop` moving from 332px to a final observed 4603px over the course of the scenario — a
+   roughly 4271px jump, consistent with the prepend inserting a large amount of new content above
+   the previously-visible position. The equivalent log for `page-up` shows the same shape: a final
+   observed offset of 4823px. Both are measured facts from the event log. Where the target row
+   itself ended up relative to that offset is not recorded — `targetMissing: true` means the oracle
+   never located it to measure. Concluding that the row is "outside the range LegendList has drawn"
+   is a plausible inference from the offset jump and the miss together, not something the harness
+   measured directly, and it is offered here as inference, not fact.
 2. **Target row rendered at the wrong offset** (finite `errPx`, `targetMissing: false`): the row
    exists in the DOM, but its position does not match where the scroll was asked to place it.
    Stock 3.3.7 shows this on `hit-two-phase` (118.1px median error) and dramatically on
