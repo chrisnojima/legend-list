@@ -1,3 +1,4 @@
+import { clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import type { StateContext } from "@/state/state";
 
 type InternalState = StateContext["state"];
@@ -24,5 +25,6 @@ export function cancelImperativeScroll(state: InternalState) {
     // recalculate layout and commit adjustments against a list that is already unmounting.
     state.scrollingTo = undefined;
     state.scrollTargetPinnedRange = undefined;
+    clearScrollTargetSettle(state);
     settlePendingImperativeScroll(state);
 }

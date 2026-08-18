@@ -3,6 +3,7 @@ import { cancelScrollCompletionChecks } from "@/core/cancelImperativeScroll";
 import { clampScrollOffset } from "@/core/clampScrollOffset";
 import { doScrollTo } from "@/core/doScrollTo";
 import { initialScrollCompletion, initialScrollWatchdog } from "@/core/initialScrollSession";
+import { beginScrollTargetSettle, clearScrollTargetSettle } from "@/core/scrollTargetSettle";
 import { updateScroll } from "@/core/updateScroll";
 import { Platform } from "@/platform/Platform";
 import type { StateContext } from "@/state/state";
@@ -197,6 +198,16 @@ export function scrollTo(
         };
         if (!isInitialScroll) {
             pinScrollTargetRenderRange(ctx, targetOffset, scrollTarget.index);
+            // Hold an index+viewPosition request across the measurement settle that follows it.
+            if (scrollTarget.index !== undefined && scrollTarget.viewPosition !== undefined) {
+                beginScrollTargetSettle(ctx, {
+                    index: scrollTarget.index,
+                    viewOffset: scrollTarget.viewOffset ?? 0,
+                    viewPosition: scrollTarget.viewPosition,
+                });
+            } else {
+                clearScrollTargetSettle(state);
+            }
         }
     }
     state.scrollPending = targetOffset;

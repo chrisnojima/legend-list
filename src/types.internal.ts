@@ -244,6 +244,15 @@ export interface InternalState {
     scrollHistory: Array<{ scroll: number; time: number }>;
     scrollingTo?: InternalScrollTarget | undefined;
     scrollTargetPinnedRange?: { end: number; start: number };
+    scrollTargetSettle?:
+        | {
+              expiresAt: number;
+              id: string;
+              quietPasses: number;
+              viewOffset: number;
+              viewPosition: number;
+          }
+        | undefined;
     horizontalRTLScrollType?: "normal" | "inverted" | "negative";
     scrollLastCalculate?: number;
     scrollLength: number;

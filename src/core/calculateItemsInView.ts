@@ -7,6 +7,7 @@ import { handleInitialScrollLayoutReady } from "@/core/initialScrollLifecycle";
 import { prepareMVCP } from "@/core/mvcp";
 import { resetLayoutCachesForDataChange } from "@/core/resetLayoutCachesForDataChange";
 import { scheduleContainerLayout } from "@/core/scheduleContainerLayout";
+import { settleScrollTarget } from "@/core/scrollTargetSettle";
 import { syncMountedContainer } from "@/core/syncMountedContainer";
 import { updateItemPositions } from "@/core/updateItemPositions";
 import { updateViewableItems } from "@/core/viewability";
@@ -558,10 +559,14 @@ export function calculateItemsInView(
         const scrollBeforeMVCP = state.scroll;
         const scrollAdjustPendingBeforeMVCP = peek$(ctx, "scrollAdjustPending") ?? 0;
         checkMVCP?.();
+        // Positions are final for this pass, so an in-flight index+viewPosition request can be
+        // re-satisfied against where its target actually is now.
+        const didSettleScrollTarget = suppressInitialScrollSideEffects ? false : settleScrollTarget(ctx);
         const didMVCPAdjustScroll =
-            !!checkMVCP &&
-            (state.scroll !== scrollBeforeMVCP ||
-                (peek$(ctx, "scrollAdjustPending") ?? 0) !== scrollAdjustPendingBeforeMVCP);
+            didSettleScrollTarget ||
+            (!!checkMVCP &&
+                (state.scroll !== scrollBeforeMVCP ||
+                    (peek$(ctx, "scrollAdjustPending") ?? 0) !== scrollAdjustPendingBeforeMVCP));
         if (didMVCPAdjustScroll) {
             updateScroll(state.scroll);
             updateScrollRange();
