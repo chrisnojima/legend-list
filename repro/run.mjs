@@ -17,6 +17,7 @@ const lib = flag("lib", "fork");
 const only = flag("only", undefined);
 const jsonOut = flag("json", undefined);
 const headed = args.includes("--headed");
+const variant = flag("variant", "A");
 
 // Always rebuild, so a run can never report on a stale bundle.
 const build = spawnSync("bun", [path.join(here, "build.mjs"), `--lib=${lib}`], { encoding: "utf8", stdio: "inherit" });
@@ -42,8 +43,18 @@ const percentile = (xs, p) => {
 const browser = await chromium.launch({ channel: "chrome", headless: !headed });
 const page = await browser.newPage({ viewport: { height: 900, width: 1280 } });
 page.on("pageerror", (e) => console.error("page error:", e.message));
-await page.goto(`file://${path.join(here, "index.html")}`);
+await page.goto(`file://${path.join(here, "index.html")}?variant=${variant}`);
 await page.waitForFunction(() => Boolean(window.__repro));
+
+// The page resolves an unknown variant string to "A" rather than throwing, so a typo in
+// --variant would otherwise silently measure the control instead of failing loudly. Confirm the
+// page actually reports back what was asked for before trusting anything it measures.
+const activeVariant = await page.evaluate(() => window.__repro.variant());
+if (activeVariant !== variant) {
+    console.error(`requested --variant=${variant} but the page reports variant=${activeVariant}`);
+    await browser.close();
+    process.exit(1);
+}
 
 const names = await page.evaluate(() => window.__repro.names());
 const targets = only ? names.filter((name) => name === only) : names;
@@ -63,7 +74,10 @@ for (const name of targets) {
             // Keep the log from the first failure of each scenario; that is the one worth reading.
             const log = await page.evaluate(() => window.__repro.log());
             fs.mkdirSync(path.join(here, "results"), { recursive: true });
-            fs.writeFileSync(path.join(here, "results", `${name}-first-failure.json`), JSON.stringify(log, null, 2));
+            fs.writeFileSync(
+                path.join(here, "results", `${name}-variant-${variant}-first-failure.json`),
+                JSON.stringify(log, null, 2),
+            );
         }
     }
 }
@@ -94,7 +108,7 @@ const rows = targets.map((name) => {
 const fmtPx = (value, hasFiniteErr) => (hasFiniteErr ? `${value.toFixed(1)}px` : "-");
 
 const pad = (s, w) => String(s).padEnd(w);
-console.log(`\nlib=${lib}  n=${n}\n`);
+console.log(`\nlib=${lib}  n=${n}  variant=${variant}\n`);
 console.log(
     `${pad("scenario", 18)}${pad("pass", 8)}${pad("missing", 9)}${pad("med err", 10)}${pad("p95 err", 10)}${pad("med settle", 12)}corrections`,
 );
@@ -112,7 +126,7 @@ if (contaminated.length) {
 }
 
 if (jsonOut) {
-    fs.writeFileSync(jsonOut, JSON.stringify({ lib, n, results, rows }, null, 2));
+    fs.writeFileSync(jsonOut, JSON.stringify({ lib, n, results, rows, variant }, null, 2));
     console.log(`\nwrote ${jsonOut}`);
 }
 

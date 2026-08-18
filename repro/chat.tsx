@@ -3,6 +3,7 @@ import React from "react";
 import { LegendList, type LegendListRef } from "@legendapp/list/react";
 import type { Msg } from "./mock";
 import type { Probe } from "./probe";
+import { resolveVariant, type VariantId } from "./variants";
 
 export interface ChatHandle {
     listRef: React.RefObject<LegendListRef | null>;
@@ -17,6 +18,7 @@ export interface ChatProps {
     onStartReached: () => void;
     probe: Probe;
     ready: boolean;
+    variant: VariantId;
 }
 
 // Image rows grow after mount, modelling decode. Two steps, so a fix that only survives one
@@ -85,7 +87,8 @@ function Footer() {
 }
 
 export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatComponent(props, ref) {
-    const { centeredId, datasetKey, messages, onEndReached, onStartReached, probe, ready } = props;
+    const { centeredId, datasetKey, messages, onEndReached, onStartReached, probe, ready, variant } = props;
+    const flags = React.useMemo(() => resolveVariant(variant), [variant]);
     const listRef = React.useRef<LegendListRef | null>(null);
     const wrapperRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -112,17 +115,26 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
 
     React.useImperativeHandle(ref, () => ({ listRef, scrollerEl }), [scrollerEl]);
 
-    // Mirrors useInitialScrollIndex in the app: start at the hit when there is one, else at the end.
+    // Mirrors useInitialScrollIndex in the app: start at the hit when there is one, else at the
+    // end. Variant D (numericInitialScrollIndex) matches the library's own chat example, which
+    // passes a bare index rather than {index, viewPosition}.
     const initialScrollIndex = React.useMemo(() => {
         if (centeredId === undefined) {
             return undefined;
         }
         const idx = messages.findIndex((m) => m.id === centeredId);
-        return idx >= 0 ? ({ index: idx, viewPosition: 0.5 } as const) : undefined;
-    }, [centeredId, messages]);
+        if (idx < 0) {
+            return undefined;
+        }
+        return flags.numericInitialScrollIndex ? idx : ({ index: idx, viewPosition: 0.5 } as const);
+    }, [centeredId, flags.numericInitialScrollIndex, messages]);
 
-    // Mirrors useScrollToCentered: send the list to the hit once per dataset.
+    // Mirrors useScrollToCentered: send the list to the hit once per dataset (imperative path).
+    // Variant F (remountOnJump) instead forces the whole LegendList to remount, so the jump goes
+    // through initialScrollIndex — the same path hit-cold already uses at first mount — rather
+    // than an imperative scrollToItem call onto a live list.
     const lastScrolledRef = React.useRef<number | undefined>(undefined);
+    const [listMountSeq, setListMountSeq] = React.useState(0);
     React.useLayoutEffect(() => {
         lastScrolledRef.current = undefined;
     }, [datasetKey]);
@@ -139,9 +151,14 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
             return;
         }
         lastScrolledRef.current = centeredId;
+        if (flags.remountOnJump) {
+            probe.log("scroll.remount", { id: centeredId });
+            setListMountSeq((n) => n + 1);
+            return;
+        }
         probe.log("scroll.request", { id: centeredId, viewPosition: 0.5 });
         void listRef.current?.scrollToItem({ animated: false, item: centeredId, viewPosition: 0.5 });
-    }, [centeredId, datasetKey, messages, probe, ready]);
+    }, [centeredId, datasetKey, flags.remountOnJump, messages, probe, ready]);
 
     const renderItem = React.useCallback(
         ({ item }: { item: number }) => {
@@ -152,6 +169,25 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
     );
 
     const ids = React.useMemo(() => messages.map((m) => m.id), [messages]);
+
+    // Variant C: pin the centered target as the sole eligible data-change anchor. Every call is
+    // logged so a run can be checked afterward for whether the library actually consulted this
+    // predicate (see repro/API-AUDIT.md).
+    const shouldRestorePosition = React.useMemo(() => {
+        if (!flags.shouldRestorePosition) {
+            return undefined;
+        }
+        return (item: number, index: number, _data: readonly number[]) => {
+            const result = centeredId === undefined || item === centeredId;
+            probe.log("shouldRestorePosition.call", { centeredId, index, item, result });
+            return result;
+        };
+    }, [centeredId, flags.shouldRestorePosition, probe]);
+
+    const getItemType = React.useCallback(
+        (item: number) => messages.find((m) => m.id === item)?.kind ?? "text",
+        [messages],
+    );
 
     const onScroll = React.useCallback(
         (e: unknown) => {
@@ -166,21 +202,22 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
             <LegendList
                 alignItemsAtEnd={true}
                 data={ids}
-                dataKey={datasetKey}
+                dataKey={flags.dropDataKey ? undefined : datasetKey}
                 drawDistance={250}
                 estimatedItemSize={72}
-                getItemType={(item: number) => messages.find((m) => m.id === item)?.kind ?? "text"}
+                getItemType={flags.dropGetItemType ? undefined : getItemType}
                 initialScrollAtEnd={initialScrollIndex === undefined}
                 initialScrollIndex={initialScrollIndex}
+                key={`list-${listMountSeq}`}
                 keyExtractor={(item: number) => String(item)}
                 ListFooterComponent={Footer}
                 ListHeaderComponent={Header}
                 maintainScrollAtEnd={centeredId === undefined}
-                maintainVisibleContentPosition={{ data: true }}
+                maintainVisibleContentPosition={flags.mvcpBare ? true : { data: true, shouldRestorePosition }}
                 onEndReached={onEndReached}
                 onScroll={onScroll}
                 onStartReached={onStartReached}
-                onStartReachedThreshold={2}
+                onStartReachedThreshold={flags.startThreshold}
                 recycleItems={true}
                 ref={listRef as React.Ref<LegendListRef>}
                 renderItem={renderItem}

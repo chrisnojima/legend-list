@@ -5,12 +5,16 @@ import { Chat, type ChatHandle } from "./chat";
 import { FakeBackend, type Msg, makeMessages } from "./mock";
 import { Probe, type ProbeEvent, positionError, type Verdict, verdictFor } from "./probe";
 import { type Assertion, SCENARIOS, type ScenarioCtx } from "./scenarios";
+import { variantFromSearch } from "./variants";
 
 declare const __REPRO_LIB__: string;
 
 const ALL_MESSAGES = makeMessages(1000, 20260818);
 const probe = new Probe();
 const INITIAL_VIEWPORT_HEIGHT = 640;
+// Read once at module load: the harness never changes variant mid-session, only across page
+// loads (repro/run.mjs's --variant flag sets it via the URL before navigating).
+const VARIANT = variantFromSearch(window.location.search);
 
 function App() {
     const [messages, setMessages] = React.useState<Msg[]>([]);
@@ -170,6 +174,7 @@ function App() {
             names: () => SCENARIOS.map((s) => s.name),
             result: () => verdictRef.current,
             run: runExclusive,
+            variant: () => VARIANT,
         };
     }, [runExclusive]);
 
@@ -180,7 +185,8 @@ function App() {
         <div style={{ display: "flex", gap: 12, padding: 12, width: "100%" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, width: 340 }}>
                 <div style={{ fontWeight: 600 }}>
-                    legend-list repro · lib=<span data-testid="lib-tag">{__REPRO_LIB__}</span>
+                    legend-list repro · lib=<span data-testid="lib-tag">{__REPRO_LIB__}</span> · variant=
+                    <span data-testid="variant-tag">{VARIANT}</span>
                 </div>
                 {SCENARIOS.map((s) => (
                     <button
@@ -242,6 +248,7 @@ function App() {
                     probe={probe}
                     ready={ready}
                     ref={chatRef}
+                    variant={VARIANT}
                 />
             </div>
         </div>
