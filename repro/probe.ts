@@ -13,7 +13,14 @@ export interface Verdict {
     errPx: number;
     fullyVisible: boolean;
     pass: boolean;
+    // True when the reset between runs did not reach quiescence within its cap — the run may be
+    // contaminated by the previous scenario. Informational only; does not affect pass.
+    resetTimedOut: boolean;
     settleMs: number;
+    // True when the oracle could not find the target row in the DOM at all (see the
+    // "oracle.targetMissing" probe event). errPx is NaN in that case, and NaN !== NaN makes that
+    // indistinguishable from a JSON-serialized null field (Task 7's artifacts) without this flag.
+    targetMissing: boolean;
 }
 
 // Where the row was asked to sit, minus where it ended up. Positive means it landed low.
@@ -33,7 +40,9 @@ export function verdictFor(args: {
     corrections: number;
     errPx: number;
     fullyVisible: boolean;
+    resetTimedOut?: boolean;
     settleMs: number;
+    targetMissing?: boolean;
     thresholdPx?: number;
 }): Verdict {
     const { corrections, errPx, fullyVisible, settleMs } = args;
@@ -43,7 +52,9 @@ export function verdictFor(args: {
         errPx,
         fullyVisible,
         pass: fullyVisible && Math.abs(errPx) <= thresholdPx,
+        resetTimedOut: args.resetTimedOut ?? false,
         settleMs,
+        targetMissing: args.targetMissing ?? false,
     };
 }
 

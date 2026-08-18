@@ -142,6 +142,19 @@ describe("Probe", () => {
         expect(probe.corrections()).toBe(2);
     });
 
+    test("a second scroll.request re-arms and discards the first request's uncounted correction", () => {
+        const probe = new Probe();
+        probe.log("scroll.request", { id: 1, viewPosition: 0.5 });
+        probe.log("scroll.observed", { offset: 100 }); // request 1's own landing scroll, free
+        probe.log("scroll.observed", { offset: 130 }); // 1 pending correction under request 1
+        probe.log("scroll.request", { id: 2, viewPosition: 0.5 }); // re-arms: resets the tally
+        expect(probe.corrections()).toBe(0); // request 1's pending correction is gone, silently
+        probe.log("scroll.observed", { offset: 200 }); // request 2's own landing scroll, free
+        expect(probe.corrections()).toBe(0);
+        probe.log("scroll.observed", { offset: 240 }); // now 1 correction, under request 2
+        expect(probe.corrections()).toBe(1);
+    });
+
     test("waitForQuiescence resolves once activity stops", async () => {
         const probe = new Probe();
         const timer = setInterval(() => probe.noteActivity(), 10);

@@ -7,6 +7,11 @@ export interface ScenarioCtx {
     appendNewest(count: number): void;
     backend: FakeBackend;
     bumpDataset(): void;
+    // Seeds messages and centeredId in the same commit as a fresh <Chat> mount, so the list
+    // bootstraps with initialScrollIndex already set (instead of mounting empty and correcting
+    // imperatively later). Use this to exercise the mount-time scroll path; setMessages +
+    // setCentered on an already-mounted <Chat> only ever exercises the imperative path.
+    mountWith(args: { centeredId: number | undefined; messages: Msg[] }): void;
     probe: Probe;
     resize(height: number): void;
     setCentered(id: number | undefined): void;
@@ -23,6 +28,9 @@ export interface Scenario {
 
 const PAGE = 40;
 const HIT_ID = 500;
+// ALL_MESSAGES runs id 0..999 (see app.tsx). Anything loaded ending at or below this id leaves
+// ids above it unused, so appendNewest has real, unseen ids to append instead of a no-op.
+const SEND_WINDOW_NEWEST_ID = 900;
 
 // A centered load in the app clears the thread first, so the list sees non-empty -> empty ->
 // non-empty. Every hit scenario goes through this.
@@ -59,9 +67,13 @@ export const SCENARIOS: Scenario[] = [
     },
     {
         name: "hit-cold",
-        proves: "mounting straight into a centered hit lands on it",
+        proves: "mounting with data and a centered target already in hand (initialScrollIndex set, initialScrollAtEnd false at mount) lands on the hit",
         async run(ctx) {
-            await openAtHit(ctx, { partialFirst: false });
+            // Fetch before mounting: mountWith puts messages and centeredId into <Chat>'s very
+            // first commit, so the list bootstraps through initialScrollIndex rather than
+            // mounting empty and correcting imperatively later (that path is hit-warm).
+            const { full } = await ctx.backend.loadCentered(HIT_ID, { pageSize: PAGE, partialFirst: false });
+            ctx.mountWith({ centeredId: HIT_ID, messages: full });
             return { kind: "centered", targetId: HIT_ID, viewPosition: 0.5 };
         },
     },
@@ -114,7 +126,10 @@ export const SCENARIOS: Scenario[] = [
         proves: "appending while at the end keeps the list pinned there",
         async run(ctx) {
             ctx.setCentered(undefined);
-            ctx.setMessages(await ctx.backend.loadNewest(PAGE));
+            // loadNewest would end at id 999 (ALL_MESSAGES' newest), leaving appendNewest nothing
+            // to add. Load a window that ends short of the newest id instead, so the two
+            // appendNewest(1) calls below have real, unused ids to append.
+            ctx.setMessages(await ctx.backend.loadOlder(SEND_WINDOW_NEWEST_ID + 1, PAGE));
             ctx.setReady(true);
             await ctx.wait(200);
             ctx.appendNewest(1);

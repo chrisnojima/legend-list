@@ -26,35 +26,45 @@ function App() {
     const chatRef = React.useRef<ChatHandle | null>(null);
     const messagesRef = React.useRef(messages);
     messagesRef.current = messages;
+    // result() must be correct immediately after run() resolves; the `verdict` state above only
+    // reflects what React has committed, which can still be the previous run's value at that
+    // point. Backed by a ref instead, written synchronously alongside the state.
+    const verdictRef = React.useRef<Verdict | undefined>(undefined);
+    // Serializes window.__repro.run calls: the HUD buttons are guarded by `running`, but the
+    // automation surface was not, and two overlapping runs would share and corrupt one Probe.
+    const runLockRef = React.useRef<Promise<unknown>>(Promise.resolve());
 
     const backend = React.useMemo(() => new FakeBackend({ latencyMs: 20, messages: ALL_MESSAGES }), []);
 
-    const measure = React.useCallback((assertion: Assertion): { errPx: number; fullyVisible: boolean } => {
-        const scroller = chatRef.current?.scrollerEl();
-        if (!scroller) {
-            return { errPx: Number.NaN, fullyVisible: false };
-        }
-        if (assertion.kind === "at-end") {
-            const distance = scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop;
-            return { errPx: distance, fullyVisible: true };
-        }
-        const row = scroller.querySelector<HTMLElement>(`[data-msg-id="${assertion.targetId}"]`);
-        if (!row) {
-            probe.log("oracle.targetMissing", { targetId: assertion.targetId });
-            return { errPx: Number.NaN, fullyVisible: false };
-        }
-        const rowRect = row.getBoundingClientRect();
-        const viewRect = scroller.getBoundingClientRect();
-        const errPx = positionError({
-            rowHeight: rowRect.height,
-            rowTop: rowRect.top,
-            viewPosition: assertion.viewPosition,
-            viewportHeight: viewRect.height,
-            viewportTop: viewRect.top,
-        });
-        const fullyVisible = rowRect.top >= viewRect.top - 0.5 && rowRect.bottom <= viewRect.bottom + 0.5;
-        return { errPx, fullyVisible };
-    }, []);
+    const measure = React.useCallback(
+        (assertion: Assertion): { errPx: number; fullyVisible: boolean; targetMissing: boolean } => {
+            const scroller = chatRef.current?.scrollerEl();
+            if (!scroller) {
+                return { errPx: Number.NaN, fullyVisible: false, targetMissing: false };
+            }
+            if (assertion.kind === "at-end") {
+                const distance = scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop;
+                return { errPx: distance, fullyVisible: true, targetMissing: false };
+            }
+            const row = scroller.querySelector<HTMLElement>(`[data-msg-id="${assertion.targetId}"]`);
+            if (!row) {
+                probe.log("oracle.targetMissing", { targetId: assertion.targetId });
+                return { errPx: Number.NaN, fullyVisible: false, targetMissing: true };
+            }
+            const rowRect = row.getBoundingClientRect();
+            const viewRect = scroller.getBoundingClientRect();
+            const errPx = positionError({
+                rowHeight: rowRect.height,
+                rowTop: rowRect.top,
+                viewPosition: assertion.viewPosition,
+                viewportHeight: viewRect.height,
+                viewportTop: viewRect.top,
+            });
+            const fullyVisible = rowRect.top >= viewRect.top - 0.5 && rowRect.bottom <= viewRect.bottom + 0.5;
+            return { errPx, fullyVisible, targetMissing: false };
+        },
+        [],
+    );
 
     const runScenario = React.useCallback(
         async (name: string): Promise<Verdict> => {
@@ -76,12 +86,18 @@ function App() {
             setDatasetSeq((n) => n + 1);
             setViewportHeight(INITIAL_VIEWPORT_HEIGHT);
             setRunSeq((n) => n + 1);
-            await probe.waitForQuiescence({ capMs: 1000, quietMs: 100 });
+            const resetQuiescence = await probe.waitForQuiescence({ capMs: 1000, quietMs: 100 });
 
-            // The reset has settled: clear now, not before, so reset activity is not counted into
-            // this scenario's own corrections or event log. Start this scenario's clock here too.
+            // The reset has settled (or gave up): clear now, not before, so reset activity is not
+            // counted into this scenario's own corrections or event log. Start this scenario's
+            // clock here too. A reset timeout is not silently swallowed: it is logged into this
+            // scenario's own event log and carried onto the verdict, so a contaminated run is
+            // visible instead of trusted.
             probe.clear();
             probe.log("scenario.start", { name });
+            if (resetQuiescence.timedOut) {
+                probe.log("reset.timedOut", { name });
+            }
             const startedAt = performance.now();
             const ctx: ScenarioCtx = {
                 appendNewest: (count) => {
@@ -92,6 +108,16 @@ function App() {
                 },
                 backend,
                 bumpDataset: () => setDatasetSeq((n) => n + 1),
+                mountWith: (args) => {
+                    // Same commit: React 18 batches these, so <Chat> mounts (fresh, via the runSeq
+                    // key bump) already holding messages and centeredId instead of mounting empty
+                    // and correcting imperatively afterward.
+                    setCenteredId(args.centeredId);
+                    setMessages(args.messages);
+                    setReady(true);
+                    setDatasetSeq((n) => n + 1);
+                    setRunSeq((n) => n + 1);
+                },
                 probe,
                 resize: (height) => setViewportHeight(height),
                 setCentered: setCenteredId,
@@ -101,11 +127,24 @@ function App() {
             };
 
             const assertion = await scenario.run(ctx);
-            const quiescence = await probe.waitForQuiescence({ capMs: 3000, quietMs: 250 });
+            // quietMs must clear the 250ms gap between chat.tsx's IMAGE_GROWTH_STEPS (150ms and
+            // 400ms), or quiescence can fire mid-growth and measure a still-settling list — this
+            // is exactly what moved hit-cold's errPx from -0.31 to 1297.69 on a harness-only
+            // change. capMs (3000) comfortably clears the last growth step plus this quiet window
+            // (400 + 300 = 700).
+            const quiescence = await probe.waitForQuiescence({ capMs: 3000, quietMs: 300 });
             const settleMs = quiescence.quiescedAt - startedAt;
-            const { errPx, fullyVisible } = measure(assertion);
-            const next = verdictFor({ corrections: probe.corrections(), errPx, fullyVisible, settleMs });
+            const { errPx, fullyVisible, targetMissing } = measure(assertion);
+            const next = verdictFor({
+                corrections: probe.corrections(),
+                errPx,
+                fullyVisible,
+                resetTimedOut: resetQuiescence.timedOut,
+                settleMs,
+                targetMissing,
+            });
             probe.log("scenario.end", { ...next, timedOut: quiescence.timedOut });
+            verdictRef.current = next;
             setVerdict(next);
             setEvents(probe.events());
             setRunning(undefined);
@@ -114,14 +153,25 @@ function App() {
         [backend, measure],
     );
 
+    // The automation surface's run(): serializes overlapping calls through runLockRef so two
+    // concurrent runs can never share and corrupt the single module-level Probe.
+    const runExclusive = React.useCallback(
+        (name: string): Promise<Verdict> => {
+            const queued = runLockRef.current.catch(() => undefined).then(() => runScenario(name));
+            runLockRef.current = queued;
+            return queued;
+        },
+        [runScenario],
+    );
+
     React.useEffect(() => {
         (window as unknown as Record<string, unknown>).__repro = {
             log: () => probe.events(),
             names: () => SCENARIOS.map((s) => s.name),
-            result: () => verdict,
-            run: runScenario,
+            result: () => verdictRef.current,
+            run: runExclusive,
         };
-    }, [runScenario, verdict]);
+    }, [runExclusive]);
 
     const onStartReached = React.useCallback(() => probe.log("list.startReached"), []);
     const onEndReached = React.useCallback(() => probe.log("list.endReached"), []);
@@ -129,13 +179,15 @@ function App() {
     return (
         <div style={{ display: "flex", gap: 12, padding: 12, width: "100%" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, width: 340 }}>
-                <div style={{ fontWeight: 600 }}>legend-list repro · lib={__REPRO_LIB__}</div>
+                <div style={{ fontWeight: 600 }}>
+                    legend-list repro · lib=<span data-testid="lib-tag">{__REPRO_LIB__}</span>
+                </div>
                 {SCENARIOS.map((s) => (
                     <button
                         data-testid={`run-${s.name}`}
                         disabled={running !== undefined}
                         key={s.name}
-                        onClick={() => void runScenario(s.name)}
+                        onClick={() => void runExclusive(s.name)}
                         style={{ cursor: "pointer", padding: 6, textAlign: "left" }}
                         title={s.proves}
                         type="button"
