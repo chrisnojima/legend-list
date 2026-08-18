@@ -1,9 +1,17 @@
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const forkRoot = path.resolve(here, "..");
+
+// The fork's own src/ imports "react" directly, and esbuild resolves each bare specifier
+// starting from its importer's directory — so without this, src/ imports would walk up to
+// forkRoot/node_modules/react (19.1.0) while app.tsx's imports resolve to repro/node_modules
+// (19.2.0), silently bundling two incompatible React copies. Anchor every "react"/"react-dom"
+// resolution at repro/'s own node_modules instead, regardless of which file imports it.
+const reproRequire = createRequire(path.join(here, "package.json"));
 
 const args = process.argv.slice(2);
 const watch = args.includes("--watch");
@@ -42,6 +50,18 @@ const options = {
             name: "legend-list-entry",
             setup(build) {
                 build.onResolve({ filter: /^@legendapp\/list\/react$/ }, () => ({ path: libEntry }));
+            },
+        },
+        {
+            name: "single-react-copy",
+            setup(build) {
+                build.onResolve({ filter: /^(react|react-dom)(\/.*)?$/ }, (args) => {
+                    try {
+                        return { path: reproRequire.resolve(args.path) };
+                    } catch (error) {
+                        return { errors: [{ text: String(error) }] };
+                    }
+                });
             },
         },
     ],
