@@ -84,7 +84,7 @@ function Footer() {
     return <div style={{ height: 8 }} />;
 }
 
-export const Chat = React.forwardRef<ChatHandle, ChatProps>(function Chat(props, ref) {
+export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatComponent(props, ref) {
     const { centeredId, datasetKey, messages, onEndReached, onStartReached, probe, ready } = props;
     const listRef = React.useRef<LegendListRef | null>(null);
     const wrapperRef = React.useRef<HTMLDivElement | null>(null);
@@ -169,7 +169,7 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function Chat(props,
                 keyExtractor={(item: number) => String(item)}
                 ListFooterComponent={Footer}
                 ListHeaderComponent={Header}
-                maintainScrollAtEnd={centeredId !== undefined ? false : true}
+                maintainScrollAtEnd={centeredId === undefined}
                 maintainVisibleContentPosition={{ data: true }}
                 onEndReached={onEndReached}
                 onScroll={onScroll}
@@ -183,3 +183,4 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function Chat(props,
         </div>
     );
 });
+Chat.displayName = "Chat";
