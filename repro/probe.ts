@@ -63,11 +63,18 @@ const MAX_EVENTS = 2000;
 // Every event type that means "a jump has just been asked for, by whatever mechanism" arms
 // correction counting the same way: scroll.request (the imperative scrollToItem path),
 // scroll.remount (variant F/G's remount-carries-initialScrollIndex path), and scroll.expected
-// (variant H's do-nothing-and-let-the-library's-own-freshData-bootstrap-handle-it path, logged
+// (variant H/I's do-nothing-and-let-the-library's-own-freshData-bootstrap-handle-it path, logged
 // for instrumentation only — it triggers no library call). Without this, corrections() is
 // structurally zero for any variant that never emits scroll.request, not because nothing needed
 // correcting but because nothing ever armed the counter. See repro/API-AUDIT.md for the case (F)
 // where an earlier version of this file left corrections silently zero for that reason.
+//
+// IMPORTANT for anyone comparing H's corrections column to F's or A's: scroll.expected logs that
+// a jump was EXPECTED, not requested — no library call happens under it. So H's corrections counts
+// scroll.observed activity after the point a jump *should* land on its own, i.e. post-transition
+// settle activity, not activity following an actual request the library received. It is a
+// related-but-not-identical quantity to F's/A's corrections (which do follow a real
+// request/remount), even though the numbers land close to each other in this audit's data.
 const ARMING_EVENTS = new Set(["scroll.expected", "scroll.remount", "scroll.request"]);
 
 export class Probe {

@@ -180,6 +180,14 @@ export const SCENARIOS: Scenario[] = [
             await openAtHit(ctx, { partialFirst: false });
             await ctx.wait(300);
             ctx.setCentered(undefined);
+            // bumpDataset() here, same as openAtHit always does on its own clear+recenter: the
+            // swap below replaces the ~480-520 hit window with a disjoint ~861-900 window, so
+            // maintainVisibleContentPosition needs the same "this is a new dataset, not a
+            // continuation" signal any other full-window swap gets. Omitting this was a bug in an
+            // earlier version of this scenario — it handed the list an unrelated dataset under an
+            // unchanged dataKey, a plausible cause of failure sitting underneath this scenario's
+            // result on its own, independent of whichever variant is under test.
+            ctx.bumpDataset();
             ctx.setMessages(await ctx.backend.loadOlder(SEND_WINDOW_NEWEST_ID + 1, PAGE));
             ctx.setReady(true);
             await ctx.wait(200);

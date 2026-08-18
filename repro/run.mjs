@@ -74,6 +74,7 @@ for (const name of targets) {
     for (let i = 0; i < n; i++) {
         const verdict = await page.evaluate((scenario) => window.__repro.run(scenario), name);
         results[name].push(verdict);
+        let firstFailureJustWritten = false;
         if (!verdict.pass && results[name].filter((v) => !v.pass).length === 1) {
             // Keep the log from the first failure of each scenario; that is the one worth reading.
             const log = await page.evaluate(() => window.__repro.log());
@@ -82,8 +83,12 @@ for (const name of targets) {
                 path.join(here, "results", `${name}-variant-${variant}-first-failure.json`),
                 JSON.stringify(log, null, 2),
             );
+            firstFailureJustWritten = true;
         }
-        if (keepLog && i === 0) {
+        // Skip when run 0 just wrote -first-failure.json above: that file already holds this
+        // exact run's event log, so writing an identical -trace.json would commit the same
+        // content twice under two names.
+        if (keepLog && i === 0 && !firstFailureJustWritten) {
             const log = await page.evaluate(() => window.__repro.log());
             fs.mkdirSync(path.join(here, "results"), { recursive: true });
             fs.writeFileSync(

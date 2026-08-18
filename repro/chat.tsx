@@ -139,6 +139,18 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
         lastScrolledRef.current = undefined;
     }, [datasetKey]);
 
+    // Variant I's discriminator: has this <Chat> instance ever committed real, ready, non-empty
+    // message data before the CURRENT jump decision? True for hit-warm (loadNewest lands real
+    // content, settles, only then does a centered jump happen); false for
+    // hit-two-phase/hit-prepend/hit-late-images/page-up (openAtHit's clear+recenter is the first
+    // content this instance ever shows). Deliberately NOT reset on datasetKey changes — openAtHit
+    // bumps the dataset as part of every centered jump, including hit-warm's, so resetting on
+    // that would erase exactly the signal this needs. Only a full <Chat> remount (the harness's
+    // own between-scenario reset) clears it, which is correct: a new mount has rendered nothing
+    // yet. The app could compute the same thing: a boolean the thread-view screen sets the first
+    // time it renders any real message, kept for the lifetime of that mounted screen.
+    const hasRenderedNonEmptyRef = React.useRef(false);
+
     React.useEffect(() => {
         if (!ready || centeredId === undefined) {
             lastScrolledRef.current = undefined;
@@ -165,9 +177,43 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
             probe.log("scroll.expected", { id: centeredId, viewPosition: 0.5 });
             return;
         }
+        if (flags.guardedDeleteImperativeScroll) {
+            // Variant I: only call scrollToItem when the list has already rendered real content
+            // before now (hasRenderedNonEmptyRef, read here BEFORE the tracking effect below runs
+            // for this same commit — see that effect's placement note). Otherwise behave like H.
+            if (hasRenderedNonEmptyRef.current) {
+                probe.log("scroll.request", { guarded: "live", id: centeredId, viewPosition: 0.5 });
+                void listRef.current?.scrollToItem({ animated: false, item: centeredId, viewPosition: 0.5 });
+            } else {
+                probe.log("scroll.expected", { guarded: "fresh", id: centeredId, viewPosition: 0.5 });
+            }
+            return;
+        }
         probe.log("scroll.request", { id: centeredId, viewPosition: 0.5 });
         void listRef.current?.scrollToItem({ animated: false, item: centeredId, viewPosition: 0.5 });
-    }, [centeredId, datasetKey, flags.deleteImperativeScroll, flags.remountOnJump, messages, probe, ready]);
+    }, [
+        centeredId,
+        datasetKey,
+        flags.deleteImperativeScroll,
+        flags.guardedDeleteImperativeScroll,
+        flags.remountOnJump,
+        messages,
+        probe,
+        ready,
+    ]);
+
+    // Declared AFTER the jump-decision effect above so, within any single commit, that effect
+    // always reads hasRenderedNonEmptyRef as it stood BEFORE this commit — a list's first-ever
+    // content arriving in the very same commit as its first centered target (hit-two-phase's
+    // partial-first-response commit, which is both ready+non-empty and already the jump target)
+    // must not retroactively count as "already live" for that commit's own decision. React runs
+    // passive effects within one component in declaration order, so this ordering is load-bearing
+    // — do not reorder these two effects.
+    React.useEffect(() => {
+        if (ready && messages.length > 0) {
+            hasRenderedNonEmptyRef.current = true;
+        }
+    }, [messages, ready]);
 
     const renderItem = React.useCallback(
         ({ item }: { item: number }) => {

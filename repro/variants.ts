@@ -2,9 +2,9 @@
 // app.tsx/chat.tsx call the library's public API — src/ is never touched. See
 // repro/API-AUDIT.md for what each variant tests and why.
 
-export type VariantId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
+export type VariantId = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
 
-export const VARIANT_IDS: VariantId[] = ["A", "B", "C", "D", "E", "F", "G", "H"];
+export const VARIANT_IDS: VariantId[] = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 
 export interface VariantFlags {
     // H: delete the imperative scrollToItem effect entirely — no call, no remount, nothing else
@@ -17,6 +17,11 @@ export interface VariantFlags {
     dropDataKey: boolean;
     // D: omit getItemType entirely.
     dropGetItemType: boolean;
+    // I: keep the imperative scrollToItem call only when the list has already rendered real,
+    // non-empty content before this jump (the live-list shape H regressed); delete it when the
+    // list has never rendered real content before this jump (the fresh-list shape H fixed). See
+    // chat.tsx's hasRenderedNonEmptyRef for exactly what this keys on.
+    guardedDeleteImperativeScroll: boolean;
     // D: maintainVisibleContentPosition={true} instead of {data: true}.
     mvcpBare: boolean;
     // D: initialScrollIndex is a bare number instead of {index, viewPosition}.
@@ -35,6 +40,7 @@ const BASE: VariantFlags = {
     deleteImperativeScroll: false,
     dropDataKey: false,
     dropGetItemType: false,
+    guardedDeleteImperativeScroll: false,
     mvcpBare: false,
     numericInitialScrollIndex: false,
     remountOnJump: false,
@@ -63,12 +69,14 @@ export function resolveVariant(id: VariantId): VariantFlags {
         case "F":
             return { ...BASE, remountOnJump: true };
         case "G":
-            // Measured after A-F: F was the only single-variable change that moved any verdict;
-            // combined here with C (no effect alone) to check C doesn't interact badly with F.
-            // See repro/API-AUDIT.md for the result (indistinguishable from F alone).
+            // Measured after A-F: F was the only single-variable-looking change that moved any
+            // verdict; combined here with C (no effect alone) to check C doesn't interact badly
+            // with F. See repro/API-AUDIT.md for the result (indistinguishable from F alone).
             return { ...BASE, remountOnJump: true, shouldRestorePosition: true };
         case "H":
             return { ...BASE, deleteImperativeScroll: true };
+        case "I":
+            return { ...BASE, guardedDeleteImperativeScroll: true };
         default:
             return { ...BASE };
     }
