@@ -10,13 +10,15 @@ declare const __REPRO_LIB__: string;
 
 const ALL_MESSAGES = makeMessages(1000, 20260818);
 const probe = new Probe();
+const INITIAL_VIEWPORT_HEIGHT = 640;
 
 function App() {
     const [messages, setMessages] = React.useState<Msg[]>([]);
     const [centeredId, setCenteredId] = React.useState<number | undefined>(undefined);
     const [datasetSeq, setDatasetSeq] = React.useState(0);
     const [ready, setReady] = React.useState(false);
-    const [viewportHeight, setViewportHeight] = React.useState(640);
+    const [viewportHeight, setViewportHeight] = React.useState(INITIAL_VIEWPORT_HEIGHT);
+    const [runSeq, setRunSeq] = React.useState(0);
     const [verdict, setVerdict] = React.useState<Verdict | undefined>(undefined);
     const [running, setRunning] = React.useState<string | undefined>(undefined);
     const [events, setEvents] = React.useState<ProbeEvent[]>([]);
@@ -38,6 +40,7 @@ function App() {
         }
         const row = scroller.querySelector<HTMLElement>(`[data-msg-id="${assertion.targetId}"]`);
         if (!row) {
+            probe.log("oracle.targetMissing", { targetId: assertion.targetId });
             return { errPx: Number.NaN, fullyVisible: false };
         }
         const rowRect = row.getBoundingClientRect();
@@ -61,16 +64,24 @@ function App() {
             }
             setRunning(name);
             setVerdict(undefined);
-            probe.clear();
-            probe.log("scenario.start", { name });
 
-            // Reset to a known state between runs so one scenario cannot inherit another's scroll.
+            // Reset to a known state between runs so one scenario cannot inherit another's scroll,
+            // dataset, or viewport height. Bumping runSeq changes <Chat>'s key, forcing a genuinely
+            // fresh mount rather than a reused one carrying scroll state, and we wait for that
+            // reset to be *observed* quiescent before starting the scenario's own clock — a fixed
+            // wait can lose the race against a previous scenario's still-settling list.
             setMessages([]);
             setCenteredId(undefined);
             setReady(false);
             setDatasetSeq((n) => n + 1);
-            await new Promise<void>((r) => setTimeout(r, 60));
+            setViewportHeight(INITIAL_VIEWPORT_HEIGHT);
+            setRunSeq((n) => n + 1);
+            await probe.waitForQuiescence({ capMs: 1000, quietMs: 100 });
 
+            // The reset has settled: clear now, not before, so reset activity is not counted into
+            // this scenario's own corrections or event log. Start this scenario's clock here too.
+            probe.clear();
+            probe.log("scenario.start", { name });
             const startedAt = performance.now();
             const ctx: ScenarioCtx = {
                 appendNewest: (count) => {
@@ -172,6 +183,7 @@ function App() {
                 <Chat
                     centeredId={centeredId}
                     datasetKey={`ds-${datasetSeq}`}
+                    key={`chat-${runSeq}`}
                     messages={messages}
                     onEndReached={onEndReached}
                     onStartReached={onStartReached}
