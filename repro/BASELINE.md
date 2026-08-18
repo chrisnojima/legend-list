@@ -7,39 +7,64 @@ Both runs used `bun repro/run.mjs --n=30` in system Chrome (Playwright, `channel
 
 ## Methodology note
 
-The stock run (`--lib=stock`) executed as a single `--n=30` sweep across all nine scenarios in
-one page load, exactly as `run.mjs` runs it end to end, and wrote `repro/results/stock.json`
-directly.
+Both tables below were produced by the same method: nine separate `--only=<scenario>` foreground
+invocations of `--n=30`, one scenario per command, merged afterward into
+`repro/results/stock.json` and `repro/results/fork.json` with a throwaway script (not committed)
+that concatenates the `results` arrays and recomputes the summary `rows` using the same
+median/percentile/pass logic as `run.mjs`. Each scenario's 30 runs happened in its own page load —
+neither table is a single continuous nine-scenario sweep. This was done because a full
+nine-scenario `--n=30` sweep (270 scenario executions) exceeds the foreground command time budget
+available while producing this document, and — after an initial draft compared a single-sweep
+stock table against a chunked fork table — because measuring the two builds by different methods
+would leave any part of the 5-vs-8 pass-count difference potentially attributable to methodology
+rather than library behavior, given this harness's known sensitivity to run context (the
+inter-scenario reset had to be made deterministic in Task 6 specifically because pass counts moved
+with it). No verdict objects were altered in the merge — `targetMissing` and `resetTimedOut` are
+preserved exactly as recorded by the probe.
 
-The fork run (`--lib=fork`) was executed as nine separate `--only=<scenario>` invocations of
-`--n=30`, one scenario per foreground command, because a full nine-scenario `--n=30` sweep (270
-scenario executions) exceeded the foreground command time budget available while producing this
-document. Each fork scenario's 30 runs therefore happened in its own page load, not in one
-continuous sweep the way the stock run did. The nine per-scenario result files were merged into
-`repro/results/fork.json` with a throwaway script (not committed) that concatenates the `results`
-arrays and recomputes the summary `rows` using the same median/percentile/pass logic as
-`run.mjs`, so the merged table below is produced by the same arithmetic the tool itself uses. No
-verdict objects were altered — `targetMissing` and `resetTimedOut` are preserved exactly as
-recorded by the probe.
+**Sweep vs. chunked comparison, stock only.** Before switching to the chunked method for stock, a
+single continuous `--n=30` sweep was also run (`--lib=stock` with no `--only`, all nine scenarios
+in one page load). Comparing that sweep against the chunked re-run, scenario by scenario:
+
+```
+scenario          pass (sweep -> chunked)   med err (sweep -> chunked)   p95 err (sweep -> chunked)
+open-newest       30 -> 30                  0.0px -> 0.0px               0.0px -> 0.0px
+hit-cold          30 -> 30                  0.3px -> 0.3px               0.3px -> 0.3px
+hit-warm          30 -> 30                  0.3px -> 0.3px               0.3px -> 0.3px
+hit-two-phase     0  -> 0                   118.1px -> 118.1px           118.1px -> 118.1px
+hit-prepend       0  -> 0                   - -> -                       - -> -
+hit-late-images   0  -> 0                   1297.7px -> 1297.7px         1297.7px -> 1297.7px
+send-at-end       30 -> 30                  0.0px -> 0.0px               0.0px -> 0.0px
+page-up           0  -> 0                   - -> -                       - -> -
+resize-at-end     30 -> 30                  0.0px -> 0.0px               0.0px -> 0.0px
+```
+
+Every scenario agrees exactly on pass count, median error, and p95 error between the two methods.
+`med settle` varied by single-digit milliseconds across the two methods (e.g. `resize-at-end`
+974.7ms swept vs. 983.9ms chunked) — consistent with ordinary timing jitter, not a methodology
+effect. This is evidence the instrument is stable across sweep and chunked measurement for stock,
+which strengthens confidence that the fork table (chunked only) is not an artifact of that method
+either. The table below is the chunked run, used because it is now methodologically identical to
+the fork table.
 
 Neither run reported any `resetTimedOut` runs (0 across all scenarios, both libs), so no result
 here is flagged as possibly contaminated by incomplete reset between runs.
 
-## Stock 3.3.7 (`--lib=stock --n=30`, single sweep)
+## Stock 3.3.7 (`--lib=stock --n=30`, assembled from nine per-scenario runs)
 
 ```
 lib=stock  n=30
 
 scenario          pass    missing  med err   p95 err   med settle  corrections
-open-newest       30/30   0        0.0px     0.0px     779ms       0
-hit-cold          30/30   0        0.3px     0.3px     765ms       3
-hit-warm          30/30   0        0.3px     0.3px     1027ms      3
-hit-two-phase     0/30    0        118.1px   118.1px   838ms       9
+open-newest       30/30   0        0.0px     0.0px     771ms       0
+hit-cold          30/30   0        0.3px     0.3px     766ms       3
+hit-warm          30/30   0        0.3px     0.3px     1030ms      3
+hit-two-phase     0/30    0        118.1px   118.1px   835ms       9
 hit-prepend       0/30    30       -         -         768ms       9
 hit-late-images   0/30    0        1297.7px  1297.7px  829ms       3
 send-at-end       30/30   0        0.0px     0.0px     771ms       0
-page-up           0/30    30       -         -         775ms       8
-resize-at-end     30/30   0        0.0px     0.0px     975ms       0
+page-up           0/30    30       -         -         777ms       8
+resize-at-end     30/30   0        0.0px     0.0px     984ms       0
 ```
 
 Stock result: **5/9 passing**.
@@ -62,6 +87,17 @@ resize-at-end     30/30   0        0.0px     0.0px     976ms       0
 ```
 
 Fork result: **8/9 passing**.
+
+## `hit-prepend`: the fork changes what fails, not whether it fails
+
+This is the single most useful signal in this document for the next task. On stock 3.3.7,
+`hit-prepend` fails because the target row cannot be found in the DOM at all
+(`targetMissing: true`, 30/30 runs) — there is nothing to measure an offset against. On the fork,
+`hit-prepend` still fails (0/30), but `targetMissing` is now `false` in every run: the target row
+*is* found, and sits a median 3381.7px from where it should be. The current fork fix restores the
+target row's identity — LegendList now knows which row it is and renders it — but not its
+position. That is a different, and narrower, remaining problem than "the fix doesn't work here,"
+and it should shape what Task 9 looks at.
 
 ## Guard sanity check
 
