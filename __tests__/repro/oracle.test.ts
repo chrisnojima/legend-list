@@ -93,6 +93,55 @@ describe("Probe", () => {
         expect(probe.corrections()).toBe(2);
     });
 
+    test("corrections() is 0 when the probe was never armed by a scroll.request", () => {
+        const probe = new Probe();
+        probe.log("scroll.observed", { offset: 1 });
+        probe.log("scroll.observed", { offset: 2 });
+        expect(probe.corrections()).toBe(0);
+    });
+
+    test("a scroll.request followed by its own landing scroll.observed reports 0 corrections", () => {
+        const probe = new Probe();
+        probe.log("scroll.request", { id: 1, viewPosition: 0.5 });
+        probe.log("scroll.observed", { offset: 100 });
+        expect(probe.corrections()).toBe(0);
+    });
+
+    test("a second scroll.observed after arming reports 1 correction", () => {
+        const probe = new Probe();
+        probe.log("scroll.request", { id: 1, viewPosition: 0.5 });
+        probe.log("scroll.observed", { offset: 100 });
+        probe.log("scroll.observed", { offset: 130 });
+        expect(probe.corrections()).toBe(1);
+    });
+
+    test("a third scroll.observed after arming reports 2 corrections", () => {
+        const probe = new Probe();
+        probe.log("scroll.request", { id: 1, viewPosition: 0.5 });
+        probe.log("scroll.observed", { offset: 100 });
+        probe.log("scroll.observed", { offset: 130 });
+        probe.log("scroll.observed", { offset: 140 });
+        expect(probe.corrections()).toBe(2);
+    });
+
+    test("clear() disarms and resets the correction count", () => {
+        const probe = new Probe();
+        probe.log("scroll.request", { id: 1, viewPosition: 0.5 });
+        probe.log("scroll.observed", { offset: 100 });
+        probe.log("scroll.observed", { offset: 130 });
+        probe.clear();
+        expect(probe.corrections()).toBe(0);
+        probe.log("scroll.observed", { offset: 999 });
+        expect(probe.corrections()).toBe(0);
+    });
+
+    test("markCorrection() still works as an explicit manual increment", () => {
+        const probe = new Probe();
+        probe.markCorrection();
+        probe.markCorrection();
+        expect(probe.corrections()).toBe(2);
+    });
+
     test("waitForQuiescence resolves once activity stops", async () => {
         const probe = new Probe();
         const timer = setInterval(() => probe.noteActivity(), 10);

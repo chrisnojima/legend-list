@@ -53,11 +53,20 @@ export class Probe {
     private buffer: ProbeEvent[] = [];
     private correctionCount = 0;
     private lastActivity = 0;
+    // Correction-counting from observed scrolls — see corrections() below for the definition.
+    private armed = false;
+    private observationsWhileArmed = 0;
 
     log(type: string, detail: Record<string, unknown> = {}): void {
         this.buffer.push({ detail, t: performance.now(), type });
         if (this.buffer.length > MAX_EVENTS) {
             this.buffer.shift();
+        }
+        if (type === "scroll.request") {
+            this.armed = true;
+            this.observationsWhileArmed = 0;
+        } else if (type === "scroll.observed" && this.armed) {
+            this.observationsWhileArmed++;
         }
         this.noteActivity();
     }
@@ -69,6 +78,8 @@ export class Probe {
     clear(): void {
         this.buffer = [];
         this.correctionCount = 0;
+        this.armed = false;
+        this.observationsWhileArmed = 0;
         this.lastActivity = performance.now();
     }
 
@@ -76,8 +87,14 @@ export class Probe {
         this.correctionCount++;
     }
 
+    // This counts observed scroll movements after a request, which is a proxy for internal
+    // library corrections, not a direct reading of them. A scroll.request arms counting and
+    // resets the observed-while-armed tally; the request's own landing scroll.observed is not a
+    // correction, so it is free — every scroll.observed after that first one while still armed
+    // is counted. Added to the explicit markCorrection() tally so existing manual callers keep
+    // working unchanged.
     corrections(): number {
-        return this.correctionCount;
+        return this.correctionCount + Math.max(0, this.observationsWhileArmed - 1);
     }
 
     noteActivity(): void {
