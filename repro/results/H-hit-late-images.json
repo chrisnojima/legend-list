@@ -1,0 +1,293 @@
+{
+  "lib": "stock",
+  "n": 30,
+  "results": {
+    "hit-late-images": [
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 830.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 830.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 827.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 826.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 830.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 830.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 827,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 823.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 829,
+        "targetMissing": false
+      },
+      {
+        "corrections": 2,
+        "errPx": 0.4375,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 828.2000000029802,
+        "targetMissing": false
+      }
+    ]
+  },
+  "rows": [
+    {
+      "corrections": 2,
+      "hasFiniteErr": true,
+      "medErr": 0.4375,
+      "medSettle": 829.0500000007451,
+      "missing": 0,
+      "name": "hit-late-images",
+      "p95Err": 0.4375,
+      "pass": 30,
+      "resetTimedOut": 0,
+      "total": 30
+    }
+  ],
+  "variant": "H"
+}
