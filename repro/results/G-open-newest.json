@@ -9,7 +9,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 775.0999999940395,
+        "settleMs": 776.3999999985099,
         "targetMissing": false
       },
       {
@@ -18,7 +18,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 993.5,
+        "settleMs": 779.5,
         "targetMissing": false
       },
       {
@@ -27,7 +27,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 774.2000000029802,
+        "settleMs": 782.3999999985099,
         "targetMissing": false
       },
       {
@@ -36,7 +36,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 788.5,
+        "settleMs": 784.5,
         "targetMissing": false
       },
       {
@@ -45,7 +45,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 788.2999999970198,
+        "settleMs": 785.9000000059605,
         "targetMissing": false
       },
       {
@@ -54,7 +54,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 775.8999999985099,
+        "settleMs": 784.3000000044703,
         "targetMissing": false
       },
       {
@@ -63,7 +63,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 775.6000000014901,
+        "settleMs": 770,
         "targetMissing": false
       },
       {
@@ -72,7 +72,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 774,
+        "settleMs": 783.2999999970198,
         "targetMissing": false
       },
       {
@@ -81,7 +81,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 772.4000000059605,
+        "settleMs": 770.4000000059605,
         "targetMissing": false
       },
       {
@@ -90,7 +90,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 773.7000000029802,
+        "settleMs": 770,
         "targetMissing": false
       },
       {
@@ -99,7 +99,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 775.6000000014901,
+        "settleMs": 765.6000000014901,
         "targetMissing": false
       },
       {
@@ -108,151 +108,7 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 774.4000000059605,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 773.5,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 769.3999999985099,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 771.7999999970198,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 769.8999999985099,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 770.2999999970198,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 774.8999999985099,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 773.3000000044703,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 772.1000000014901,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 769.1999999955297,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 770.7000000029802,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 770.7000000029802,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 771.3999999985099,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 787.7000000029802,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 774,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 790.1000000014901,
-        "targetMissing": false
-      },
-      {
-        "corrections": 0,
-        "errPx": 0,
-        "fullyVisible": true,
-        "pass": true,
-        "resetTimedOut": false,
-        "settleMs": 771.3999999985099,
+        "settleMs": 770.2000000029802,
         "targetMissing": false
       },
       {
@@ -270,7 +126,151 @@
         "fullyVisible": true,
         "pass": true,
         "resetTimedOut": false,
-        "settleMs": 775.3999999985099,
+        "settleMs": 768.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 770.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 760.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 773.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 766.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 770,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 767.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 774.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 762.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 772.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 765.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 783.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 783.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 773.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 781.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 781.7999999970198,
         "targetMissing": false
       }
     ]
@@ -280,7 +280,7 @@
       "corrections": 0,
       "hasFiniteErr": true,
       "medErr": 0,
-      "medSettle": 773.8500000014901,
+      "medSettle": 771.6999999992549,
       "missing": 0,
       "name": "open-newest",
       "p95Err": 0,
