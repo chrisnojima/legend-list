@@ -1,0 +1,434 @@
+[
+  {
+    "detail": {
+      "name": "page-up"
+    },
+    "t": 183.70000000298023,
+    "type": "scenario.start"
+  },
+  {
+    "detail": {
+      "id": 500
+    },
+    "t": 208.70000000298023,
+    "type": "scroll.remount"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 57,
+      "id": 495
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 106,
+      "id": 496
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 63,
+      "id": 497
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 131,
+      "id": 498
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 45,
+      "id": 499
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 47,
+      "id": 500
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 110,
+      "id": 501
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 60,
+      "id": 502
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 55,
+      "id": 503
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 63,
+      "id": 504
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 58,
+      "id": 505
+    },
+    "t": 220.10000000149012,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 182,
+      "id": 506
+    },
+    "t": 220.20000000298023,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 61,
+      "id": 507
+    },
+    "t": 220.20000000298023,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 123,
+      "id": 508
+    },
+    "t": 220.20000000298023,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 66,
+      "id": 509
+    },
+    "t": 220.20000000298023,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 55,
+      "id": 510
+    },
+    "t": 220.20000000298023,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 62,
+      "id": 511
+    },
+    "t": 220.20000000298023,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 44,
+      "id": 494
+    },
+    "t": 222.89999999850988,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 294,
+      "id": 491
+    },
+    "t": 222.89999999850988,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 56,
+      "id": 493
+    },
+    "t": 222.89999999850988,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 55,
+      "id": 492
+    },
+    "t": 223,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 61,
+      "id": 490
+    },
+    "t": 223,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 1362
+    },
+    "t": 235,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "extra": 40,
+      "id": 491
+    },
+    "t": 375.8999999985099,
+    "type": "row.grew"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 334,
+      "id": 491
+    },
+    "t": 377.1000000014901,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 1402
+    },
+    "t": 385.30000000447035,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 57,
+      "item": 497,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 58,
+      "item": 498,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 59,
+      "item": 499,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 60,
+      "item": 500,
+      "result": true
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 61,
+      "item": 501,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 62,
+      "item": 502,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 63,
+      "item": 503,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 64,
+      "item": 504,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 65,
+      "item": 505,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 57,
+      "item": 497,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 58,
+      "item": 498,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 59,
+      "item": 499,
+      "result": false
+    },
+    "t": 555.3999999985099,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "centeredId": 500,
+      "index": 60,
+      "item": 500,
+      "result": true
+    },
+    "t": 555.5,
+    "type": "shouldRestorePosition.call"
+  },
+  {
+    "detail": {
+      "offset": 6072
+    },
+    "t": 558.8000000044703,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 6072
+    },
+    "t": 558.8999999985099,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "extra": 60,
+      "id": 491
+    },
+    "t": 624.5,
+    "type": "row.grew"
+  },
+  {
+    "detail": {
+      "estimated": 72,
+      "height": 394,
+      "id": 491
+    },
+    "t": 625.3000000044703,
+    "type": "row.measured"
+  },
+  {
+    "detail": {
+      "offset": 6132
+    },
+    "t": 651.8000000044703,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "offset": 6132
+    },
+    "t": 651.8999999985099,
+    "type": "scroll.observed"
+  },
+  {
+    "detail": {
+      "corrections": 5,
+      "errPx": 0.1875,
+      "fullyVisible": true,
+      "pass": true,
+      "resetTimedOut": false,
+      "settleMs": 772.1999999955297,
+      "targetMissing": false,
+      "timedOut": false
+    },
+    "t": 956.8000000044703,
+    "type": "scenario.end"
+  }
+]
