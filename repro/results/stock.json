@@ -1,0 +1,2564 @@
+{
+  "lib": "stock",
+  "n": 30,
+  "results": {
+    "open-newest": [
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 776.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 783.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 784.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 774.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 789,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 787.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 785.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 782,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 784,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 770.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 782.4000000059605,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 775.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 784.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 773.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 981.4000000059605,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 785.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 773.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.4000000059605,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 755.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 780.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 767.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 782.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 787.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 774,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 776.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1003.3000000044703,
+        "targetMissing": false
+      }
+    ],
+    "hit-cold": [
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 764.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 766.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 746.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 749.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 752.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 753.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 766.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 751.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 767.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 774.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 754.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 752.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 762.0999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 756,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 764,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 753.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 749.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 765.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 767.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 764.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 767,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 763.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 754,
+        "targetMissing": false
+      }
+    ],
+    "hit-warm": [
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1030.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1026.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1038.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1023.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1015.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1021.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1028.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1028.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1040.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1029.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1025.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1025.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1040.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1026,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1012.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1025.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1039.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1026.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1028.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1028.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1010.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1031.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1039.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1027.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1041.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1026.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1031.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1025,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1022.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": -0.3125,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1026.3000000044703,
+        "targetMissing": false
+      }
+    ],
+    "hit-two-phase": [
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 834.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 831.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 832.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 837.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 829.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 844,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 836.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 846,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 840.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 837.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 848.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 837.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 839.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 833.0999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 838.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 849.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 837.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 831.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 833.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 843.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 832.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 851.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 851.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 835.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 840.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 835.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 838.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 847.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 9,
+        "errPx": 118.0625,
+        "fullyVisible": true,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 842.8000000044703,
+        "targetMissing": false
+      }
+    ],
+    "hit-prepend": [
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 772.2999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 773.3999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 770.7000000029802,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 764.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 760.8999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.3000000044703,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 765.6000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 770.1000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 768,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 759.6999999955297,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 766,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.3999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 779.6000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 780.2999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 765.6000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 767.9000000059605,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 771,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 771.2000000029802,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 770.1000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 765.1000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 751,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 768.8999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 773.1000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 762.5999999940395,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 767.6000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 767.7999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 769.5999999940395,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 764.5999999940395,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 767.3999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 9,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 787.6000000014901,
+        "targetMissing": true
+      }
+    ],
+    "hit-late-images": [
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 823.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 838.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 827,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 839,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 841.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 841.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 840.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 840.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 824.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 831.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 826.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 829.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 839.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 825.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 830.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.3000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 829.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 826.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 829.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 829.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 832,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 840.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 841.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 828.9000000059605,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 826.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 3,
+        "errPx": 1297.6875,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 826.2999999970198,
+        "targetMissing": false
+      }
+    ],
+    "send-at-end": [
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 775.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 772.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 782.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 756.9000000059605,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 787.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 766,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 774.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 759.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 770,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 772.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 769.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 772.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 1004.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 772,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 783,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 760.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 777,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 763.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 772.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 782.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 776.3999999985099,
+        "targetMissing": false
+      }
+    ],
+    "page-up": [
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 776.7000000029802,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 776.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 776.3999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 771.2999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 778.7999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 775.2999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 772.7999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 776.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 783.8999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.6000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 755.8999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 757.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 759.7999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 760.8999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 758.3999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 775.1999999955297,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 775,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 775.6999999955297,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 777.5999999940395,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 772.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 776.8999999985099,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 758.7999999970198,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 757.5,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 757.3000000044703,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.7000000029802,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 760.1000000014901,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 774.7000000029802,
+        "targetMissing": true
+      },
+      {
+        "corrections": 8,
+        "errPx": null,
+        "fullyVisible": false,
+        "pass": false,
+        "resetTimedOut": false,
+        "settleMs": 772.3000000044703,
+        "targetMissing": true
+      }
+    ],
+    "resize-at-end": [
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 977.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 973.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 974.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 974.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 770.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 765.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 754.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 975.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 975.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 974.2000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 975.3999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 985.8000000044703,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 973.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 987.1000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 986.2999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 975.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 992.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 974.6999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 976.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 755.1999999955297,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 974.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 971.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 988.5999999940395,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 765.6000000014901,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 988.5,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 989.7000000029802,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 768.7999999970198,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 771.8999999985099,
+        "targetMissing": false
+      },
+      {
+        "corrections": 0,
+        "errPx": 0,
+        "fullyVisible": true,
+        "pass": true,
+        "resetTimedOut": false,
+        "settleMs": 977.8000000044703,
+        "targetMissing": false
+      }
+    ]
+  },
+  "rows": [
+    {
+      "corrections": 0,
+      "hasFiniteErr": true,
+      "medErr": 0,
+      "medSettle": 778.6500000022352,
+      "missing": 0,
+      "name": "open-newest",
+      "p95Err": 0,
+      "pass": 30,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 3,
+      "hasFiniteErr": true,
+      "medErr": 0.3125,
+      "medSettle": 764.7499999962747,
+      "missing": 0,
+      "name": "hit-cold",
+      "p95Err": 0.3125,
+      "pass": 30,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 3,
+      "hasFiniteErr": true,
+      "medErr": 0.3125,
+      "medSettle": 1027.1000000014901,
+      "missing": 0,
+      "name": "hit-warm",
+      "p95Err": 0.3125,
+      "pass": 30,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 9,
+      "hasFiniteErr": true,
+      "medErr": 118.0625,
+      "medSettle": 837.5500000007451,
+      "missing": 0,
+      "name": "hit-two-phase",
+      "p95Err": 118.0625,
+      "pass": 0,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 9,
+      "hasFiniteErr": false,
+      "medErr": null,
+      "medSettle": 768.4499999992549,
+      "missing": 30,
+      "name": "hit-prepend",
+      "p95Err": null,
+      "pass": 0,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 3,
+      "hasFiniteErr": true,
+      "medErr": 1297.6875,
+      "medSettle": 829.3499999977648,
+      "missing": 0,
+      "name": "hit-late-images",
+      "p95Err": 1297.6875,
+      "pass": 0,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 0,
+      "hasFiniteErr": true,
+      "medErr": 0,
+      "medSettle": 771.1499999985099,
+      "missing": 0,
+      "name": "send-at-end",
+      "p95Err": 0,
+      "pass": 30,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 8,
+      "hasFiniteErr": false,
+      "medErr": null,
+      "medSettle": 774.5500000007451,
+      "missing": 30,
+      "name": "page-up",
+      "p95Err": null,
+      "pass": 0,
+      "resetTimedOut": 0,
+      "total": 30
+    },
+    {
+      "corrections": 0,
+      "hasFiniteErr": true,
+      "medErr": 0,
+      "medSettle": 974.6999999992549,
+      "missing": 0,
+      "name": "resize-at-end",
+      "p95Err": 0,
+      "pass": 30,
+      "resetTimedOut": 0,
+      "total": 30
+    }
+  ]
+}
