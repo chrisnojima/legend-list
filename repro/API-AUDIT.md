@@ -290,13 +290,14 @@ scenarios.** Under a correctly guarded call site, the fork provably adds nothing
 scenarios it was built to fix. This is the sentence the previous draft tried to earn without the
 measurement; it is earned now.
 
-**Full fork inventory, stated exactly (7 runs across 6 distinct scenarios — corrected from the
+**Full fork inventory, stated exactly (8 runs across 6 distinct scenarios — corrected from the
 previous draft's "3 of 10," which undercounted both the run and scenario totals even before this
 round's new runs):**
 
 ```
 fork, variant A, hit-then-end-anchor: 30/30 (0.0px)
 fork, variant I, hit-warm:            30/30 (0.3px)
+fork, variant I, hit-then-end-anchor: 28/30 (0.0px med, 196.0px p95)   [ungated build]
 fork, variant I, hit-then-end-anchor: 30/30 (0.0px)   [gated build]
 fork, variant I, hit-two-phase:       30/30 (0.3px)   [this round]
 fork, variant I, hit-prepend:         30/30 (0.7px)   [this round]
@@ -310,12 +311,13 @@ Separately, **Task 8's original fork measurement** (`repro/BASELINE.md`'s fork t
 stock+A on `hit-two-phase`, `hit-late-images`, `page-up` (stock fails, fork passes) and
 `hit-prepend` (both fail, differently).
 
-**What the full set does and does not establish:** fork+I now matches stock+I on 6 of the 9
-original scenarios, including all four scenarios where Task 8 showed a fork/stock difference
-existed under variant A. It has not been run on `open-newest`, `hit-cold`, `send-at-end`, or
-`resize-at-end` under I — those are guard/passing scenarios with no prior evidence of a
-fork/stock difference under any configuration, so this is a lower-priority gap than the four just
-closed, but it is a real, named gap rather than an implied "everywhere."
+**What the full set does and does not establish:** fork+I now matches stock+I on 5 of the 9
+original scenarios (`hit-warm` plus the four originally-failing ones), including all four
+scenarios where Task 8 showed a fork/stock difference existed under variant A. It has not been run
+on `open-newest`, `hit-cold`, `send-at-end`, or `resize-at-end` under I — those are guard/passing
+scenarios with no prior evidence of a fork/stock difference under any configuration, so this is a
+lower-priority gap than the four just closed, but it is a real, named gap rather than an implied
+"everywhere."
 
 ## The `hit-then-end-anchor` result — corrected numbers, quantified uncertainty, and a new finding
 
@@ -334,7 +336,7 @@ HEAD, not only in git history:
 ```
 ungated build, stock, variant I:  27/30  (3/30 fail = 10.0%)
 ungated build, fork,  variant I:  28/30  (2/30 fail = 6.7%)   [a separate data point, not a second stock run]
-gated build,   stock, variant I:  29/30, 30/30, 30/30 across three separate n=30 runs (89/90 fail = 1.1%)
+gated build,   stock, variant I:  29/30, 30/30, 30/30 across three separate n=30 runs (1/90 fail = 1.1%)
 gated build,   fork,  variant I:  30/30  (0/30 fail)
 ```
 
@@ -367,16 +369,20 @@ gated build, stock, variant F: 30/30 (0.0px)
 gated build, stock, variant H: 28/30 (0.0px med, 196.0px p95) — was 30/30 on the ungated build
 ```
 
-**H's result changed, and this is the most important new finding of this round.** H's own
-decision logic never reads `hasRenderedNonEmptyRef` — H is `flags.deleteImperativeScroll`, a
-different flag from I's `flags.guardedDeleteImperativeScroll`, and the tracker effect's body only
-ever executes when the latter is true. Gating could not have changed anything about what code
-runs during an H measurement; the tracker effect was already irrelevant to H's own scroll decision
-on both builds. **Yet H flipped from clean (30/30, ungated) to showing the identical failure
-signature (`errPx: 196`, `fullyVisible: true`) on the gated build.** This is evidence *against*
-the tracker effect being a sufficient explanation for the failure pattern previously attributed to
-it under variant I — a build change that provably does not touch H's code path correlates with H
-acquiring the same failure.
+**This is the most important new finding of this round, and it is a rate finding, not a flip.**
+H's own decision logic never reads `hasRenderedNonEmptyRef` — H is `flags.deleteImperativeScroll`,
+a different flag from I's `flags.guardedDeleteImperativeScroll`, and the tracker effect's body only
+ever executes when the latter is true. Gating could not have changed anything about what code runs
+during an H measurement; the tracker effect was already irrelevant to H's own scroll decision on
+both builds. H's earlier "clean" row was a single n=30 run; at the ~3.3% rate this scenario turns
+out to show overall, `P(0 failures in 30) ≈ (1 - 0.033)^30 ≈ 0.36` — a clean run was itself a
+likely outcome at that rate, not evidence the rate was zero. **The correct reading is: H's earlier
+clean run was consistent with the same low rate all along, and this round's re-measurement reveals
+the failure was never variant-I-specific.** That is evidence *against* the tracker effect being a
+sufficient explanation for the failure pattern previously attributed to it under variant I — not
+because something "changed" when H was re-measured, but because H was never shown to be exempt
+from this failure in the first place; the earlier single clean run simply didn't have the power to
+detect a ~3% rate.
 
 **Full run inventory for this scenario, both builds, all four variants tested:**
 
@@ -439,12 +445,16 @@ fork + variant I, the four originally-failing scenarios (new this round — the 
 ## Final classification
 
 **Accurate headline: I is 9/9 on the nine original scenarios — on both stock and, for the four
-scenarios that most needed checking, fork — with a small, real, statistically-borderline
-(p ≈ 0.048 vs. the superseded ungated build), mechanistically unconfirmed failure rate (~3.3%
-combined across builds) on the guard scenario added specifically to cover this variant's blind
-spot, a failure rate now also observed under variant H.** Not bare "9/9" — the guard exists
-because the original nine don't test the shape where `centeredId` transitions back to `undefined`
-after a jump, and neither H nor I passes it with certainty.
+scenarios that most needed checking, fork — with a small, real, reproducible (6/180 = 3.3%
+combined, same `errPx: 196`/`fullyVisible: true` signature every time) failure on the guard
+scenario added specifically to cover this variant's blind spot. The failure itself is not
+borderline — it is a consistent, repeated event, now observed under both H and I. What is
+borderline, and given H's result probably spurious, is a narrower claim this document no longer
+makes with confidence: that gating changed the rate (two run sets of the same nine-scenario-
+plus-guard configuration, before vs. after gating, differ at p ≈ 0.048 — thin evidence for an
+effect that H's re-measurement argues against).** Not bare "9/9" — the guard exists because the
+original nine don't test the shape where `centeredId` transitions back to `undefined` after a
+jump, and neither H nor I passes it with certainty.
 
 - **`hit-two-phase`, `hit-prepend`, `hit-late-images`, `page-up`:** API misuse. Deleting the
   redundant imperative call for the fresh-list shape (I, matching H) fixes all four **on both
@@ -458,7 +468,10 @@ after a jump, and neither H nor I passes it with certainty.
   build, A and F are clean (60/60 each across both builds); H and I both show the same
   `errPx: 196` failure at a combined rate of 6/180 (3.3%) — including H, whose own decision logic
   never executes the code round 4 blamed for I's version of this failure. It is **not** classified
-  as a library gap (present at a comparable rate on both stock and fork) and **not** classified as
+  as a library gap: combined across both builds, stock I fails at 4/120 (3.3%) and fork I fails at
+  2/60 (3.3%) — the same rate on both libraries, which is the specific evidence for saying so (not
+  the softer "too thin to rule anything out" framing used above for the narrower gating-effect
+  question, which is a different claim about a much smaller sample). It is **not** classified as
   resolved or as caused by any single identified mechanism. See "what would settle this" in the
   section above.
 
@@ -551,7 +564,24 @@ Task 9 should treat two things as separately settled: (1) the four-scenario slic
 fork+I measurement establishes that directly; (2) "the entire fork diff can be deleted" is not yet
 settled — it rests on app-side validation of the guard's two preconditions (named in "Final
 classification" above) and on understanding the `hit-then-end-anchor` failure shared by H and I,
-neither of which this audit resolved. Five rounds of review found real problems in every draft
-through round 4; this round found no problems in its predecessor's methodology, only in scope
-(the decisive fork run was missing) and in overreach (two claims stated with more certainty than
-the evidence supported). Both are fixed here. What remains open is named, not glossed.
+neither of which this audit resolved. This final round found a genuine cross-build measurement
+defect in its immediate predecessor — three guard-scenario rows (A/F/H) had been left on a stale,
+ungated build while variant I's rows had moved to the corrected one — and re-measuring to close it
+produced this round's only new result: variant H shows the same failure variant I does, which
+argues against the tracker effect being its cause. What remains open is named, not glossed.
+
+## Bottom line
+
+- **The four-scenario slice of the fork diff can be retired on this evidence.** Fork+I matches
+  stock+I exactly (pass count, med/p95 err, corrections) on `hit-two-phase`, `hit-prepend`,
+  `hit-late-images`, and `page-up` — the scenarios Task 8 built `scrollTargetSettle` to fix.
+- **"Delete the entire fork diff" cannot be concluded from this audit.** Four of the nine original
+  scenarios were never tested under fork+I, and the `hit-then-end-anchor` failure below is
+  unresolved on both libraries.
+- **Shipping the guarded deletion (variant I) carries a known, unexplained ~3% failure on the
+  jump-then-return-to-live shape (`hit-then-end-anchor`).** No variant tested fixes it. The guard
+  does not cause it — it is a property of skipping the imperative call for the initial jump: H and
+  I (which both skip it under some or all conditions) fail this shape at a combined 6/180 (3.3%);
+  A and F (which always issue an explicit scroll action — an imperative call, or a remount) are
+  clean across 120 runs each (60 apiece). Its mechanism is undetermined; see "what would settle
+  this" above.
