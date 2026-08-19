@@ -2,6 +2,8 @@ import { Platform } from "@/platform/Platform";
 import { peek$, type StateContext, set$ } from "@/state/state";
 import type { Insets } from "@/types.base";
 import { requestAdjust } from "@/utils/requestAdjust";
+import { handleBootstrapInitialScrollLayoutChange } from "./bootstrapInitialScroll";
+import { doMaintainScrollAtEnd } from "./doMaintainScrollAtEnd";
 import { maybeUpdateAnchoredEndSpace } from "./updateAnchoredEndSpace";
 import { updateContentMetricsState } from "./updateContentMetricsState";
 
@@ -50,6 +52,22 @@ export function setHeaderSize(ctx: StateContext, size: number) {
         // is a real content shift above the viewport and should preserve MVCP.
         if (hasMeasuredOrEstimatedHeaderBaseline && shouldAdjustForHeaderSizeChange(ctx, previousHeaderSize, size)) {
             requestAdjust(ctx, size - previousHeaderSize);
+        } else if (state.props.maintainScrollAtEnd?.onHeaderLayout) {
+            // Nothing compensated the shift - MVCP does not anchor sizes, or an initial scroll is
+            // still in flight, which is exactly when a header measures for the first time. Everything
+            // below the header just moved down by the difference, so a list that had reached its end
+            // is now short of it and has to follow.
+            //
+            // Two authorities, called in the order they own the position. While an at-end initial
+            // scroll is alive it is the only one that can act: it resolved its offset from the
+            // content it could see, so a header measuring afterwards moves that offset and the
+            // bootstrap has to re-aim, exactly as it does for a viewport change. The end anchor
+            // cannot cover that window - it declines any scroll issued while another one is in
+            // flight and never replays the one it dropped. Once the initial scroll is out of the
+            // picture doMaintainScrollAtEnd owns the end, and it stands down on its own when the
+            // reader is not there.
+            handleBootstrapInitialScrollLayoutChange(ctx);
+            doMaintainScrollAtEnd(ctx);
         }
     }
 
