@@ -1,20 +1,22 @@
 # API conformance audit: stock @legendapp/list 3.3.7
 
-Date: 2026-08-18, revised twice after review. Stock commit measured: the vendored
+Date: 2026-08-18, revised across four review rounds. Stock commit measured: the vendored
 `repro/vendor/legend-3.3.7-stock.mjs` build used throughout Tasks 1-8. `src/` was never modified
 for any measurement in this document.
 
-**This document supersedes its first two drafts.** Draft 1 concluded "no library gap remains"
-from variant F alone, which conflated two changes (deleting the imperative call and forcing a
-remount) and mismeasured corrections (armed only on an event F never emits). Draft 2 corrected
-those with a decisive control (variant H: delete the call, nothing else) — H fixed the four
-original failures but broke `hit-warm`, and draft 2 over-corrected into "the fork still has a
-job" without a single fork measurement to support it. **This draft adds variant I — the same
-deletion, but guarded so it only applies where H showed it was safe — and fork measurements
-against the two scenarios draft 2's claim rested on.** I is 9/9 on stock, and the fork does
-nothing different from stock on either of those two scenarios. The corrected conclusion: **no
-library change is needed; the entire fork diff is a deletion candidate**, with one open,
-non-library-specific item flagged below rather than glossed over.
+**This document supersedes its first three drafts.** Draft 1 concluded "no library gap remains"
+from variant F alone (which conflated two changes) and mismeasured corrections. Draft 2 corrected
+those but over-corrected into "the fork still has a job" without a fork measurement to support it.
+Draft 3 added variant I (a guarded deletion) and fork measurements, reaching "I is 9/9, no library
+change needed, delete the fork diff" — but the tracker effect behind I's guard ran unconditionally
+for every variant, meaning A-H's committed results were measured on a build that predates it,
+which specifically undercut the comparison the whole conclusion rested on. **This draft gates that
+effect, re-measures I on the corrected build, and states the result precisely: I is 9/9 on the
+original nine scenarios, with a 27-30/30 (not clean 30/30) result on the guard scenario added to
+cover exactly this variant's blind spot — not resolved, characterized. The fork claim is scoped to
+what was actually measured (2 of 10 scenarios, plus one scenario at variant A), not stated as
+general coverage. App portability of the guard's discriminator is stated as unvalidated, not
+assumed.**
 
 ## The question this audit answers
 
@@ -22,63 +24,87 @@ non-library-specific item flagged below rather than glossed over.
 > pass by using the library's public API correctly and completely?
 
 `repro/BASELINE.md` measured stock 3.3.7 at 5/9 with the harness's original prop configuration
-and the fork's hand-rolled `scrollTargetSettle` at 8/9. Before spending any more of the fork diff
-on the four failures (`hit-two-phase`, `hit-late-images`, `hit-prepend`, `page-up`), this audit
-checks whether some or all of that gap is our own incomplete use of the public API rather than
-something the library genuinely cannot do.
+and the fork's hand-rolled `scrollTargetSettle` at 8/9 (comparing to stock under that same,
+control-shaped configuration — see "Fork measurements" below for exactly what that comparison
+covers and doesn't).
 
-**Result: yes, all of it. A correctly guarded deletion of the app's redundant imperative
-`scrollToItem` call (variant I) reaches 9/9 on stock 3.3.7** — it fixes the four original
-failures (matching variant H's own numbers) while keeping every scenario H broke (`hit-warm`) at
-parity with control. The fork build shows no different behavior from stock on either scenario
-that motivated keeping the fork diff in the previous draft. See "Final classification."
+**Result: variant I (a guarded deletion of the app's redundant imperative `scrollToItem` call)
+reaches 9/9 on the nine original scenarios, on pure stock 3.3.7, with zero library changes.** It
+does not reach a clean pass on every scenario measured in this audit — a guard scenario added in
+review round 2 specifically to cover this variant's own blind spot shows a small, real, unresolved
+regression. See "Final classification" for the precise, bounded statement.
 
 ## Variant mechanism
 
 `repro/variants.ts` defines `VariantFlags` and `resolveVariant(id)` for variants `A`-`I`. The
-active variant is read once at module load from the page's URL (`?variant=`, see
-`variantFromSearch`), defaulting to `A` for anyone opening `index.html` directly. `chat.tsx`
-takes a `variant` prop and derives every per-variant prop/orchestration change from
-`resolveVariant`. `app.tsx` exposes the active variant as `window.__repro.variant()` and renders
-it in the HUD (`data-testid="variant-tag"`). `repro/run.mjs` gained `--variant=` (default `A`):
-it appends the variant to the page URL, then calls `window.__repro.variant()` after load and
+active variant is read once at module load from the page's URL (`?variant=`), defaulting to `A`.
+`chat.tsx` takes a `variant` prop and derives every per-variant prop/orchestration change from
+`resolveVariant`, gated behind the relevant flag so that a variant whose flag is off runs the same
+code path control does (see the note on `hasRenderedNonEmptyRef`'s tracker effect below — a case
+where this discipline was violated and then fixed). `app.tsx` exposes the active variant as
+`window.__repro.variant()`. `repro/run.mjs`'s `--variant=` appends the variant to the page URL and
 aborts loudly if the page reports back something other than what was requested. The variant is
-recorded in every `--json` output alongside `lib`, `n`, `results`, and `rows`. `--keep-log`
-captures the first run's full event trace for every targeted scenario, pass or fail, so a variant
-that flips a verdict has a committed trace; it skips writing a trace when run 0 already triggered
-the on-failure capture, so the same content is never committed twice under two names.
+recorded in every `--json` output. `--keep-log` captures the first run's full event trace for
+every targeted scenario, pass or fail, without double-writing when the on-failure capture already
+covers run 0.
+
+**One important build note, added this round:** `chat.tsx` bundles the SAME `bundle.js` for every
+variant — the variant is chosen at runtime via the URL, not by rebuilding. That means a
+harness-level source change that isn't correctly gated behind its owning variant's flag silently
+changes what *every other variant's* measurements are running against, even though those
+variants' own `resolveVariant` output is unchanged. This is exactly what happened with variant I's
+tracker effect (below) and is why it mattered enough to require re-measurement rather than just a
+note.
 
 ## Variant definitions
 
 All variants change only `repro/chat.tsx`/`repro/app.tsx`/`repro/scenarios.ts` prop and
 orchestration usage. `src/` is untouched in every case.
 
-- **A — control.** Current harness configuration (unchanged from Task 8). `onStartReachedThreshold={2}`, `maintainVisibleContentPosition={{data: true}}` (no `shouldRestorePosition`), `initialScrollIndex={{index, viewPosition: 0.5}}`, `dataKey` set, `getItemType` set, jumps to an already-mounted list issued via `listRef.current.scrollToItem({animated: false, item, viewPosition: 0.5})` from an effect.
-- **B — default start threshold.** Only `onStartReachedThreshold={0.5}` instead of `2`.
-- **C — `shouldRestorePosition`.** Only adds `maintainVisibleContentPosition.shouldRestorePosition = (item, index, data) => centeredId === undefined || item === centeredId`, pinning the centered target as the sole eligible data-change anchor while one is set.
-- **D — chat example's shape.** `maintainVisibleContentPosition={true}` (bare), `initialScrollIndex` as a bare number (no `viewPosition`), `getItemType` omitted, `dataKey` omitted. `maintainScrollAtEnd` stays conditional on `centeredId`.
-- **E — no `dataKey`.** Only `dataKey` omitted; everything else stays at control.
-- **F — mount-path jumps (two variables).** When `centeredId` changes on an already-mounted `<Chat>`, instead of calling `scrollToItem` the list itself remounts (`key` bump) with `initialScrollIndex` already carrying the target. This simultaneously (1) removes the imperative call and (2) forces a fresh mount in place of the library's live-list freshData reset path — which of the two does the work was not separable from F alone.
-- **G — F + C combined.** Included to check C doesn't interact badly with F.
-- **H — decisive control: delete the imperative call, nothing else.** `repro/chat.tsx`'s `scrollToItem` effect is skipped entirely — no call, no remount, no other prop difference from A. Isolates variable (1) from F's two.
-- **I — the guarded deletion.** Keeps the imperative `scrollToItem` call only when the list has already rendered real, non-empty content before this jump; deletes it (behaves like H) when the list has never rendered real content before now. **Discriminator, exactly:** `chat.tsx`'s `hasRenderedNonEmptyRef` — a ref that becomes `true` the first time an effect observes `ready && messages.length > 0`, and stays `true` for the lifetime of the `<Chat>` mount (it is deliberately *not* reset when `datasetKey` changes, since `openAtHit` bumps the dataset as part of every centered jump including `hit-warm`'s — resetting on that would erase exactly the signal needed). The jump-decision effect is declared *before* the ref-tracking effect in the component, so within any single commit the decision always reads the ref's value from *before* that commit — a list's first-ever content arriving in the same commit as its first jump target (`hit-two-phase`'s partial-first-response commit is both `ready && messages.length > 0` and already the jump target) must not retroactively read as "already live" for that same commit's decision. **Why the app could compute the same thing:** this keys on "has the currently-mounted thread view ever shown any real messages before," which is exactly the kind of boolean a thread screen can set the first time it renders actual message data and hold for the screen's lifetime — no library internals are needed to compute it, only the app's own knowledge of whether this is the first paint of real content for the currently-open thread.
+- **A — control.** `onStartReachedThreshold={2}`, `maintainVisibleContentPosition={{data: true}}`, `initialScrollIndex={{index, viewPosition: 0.5}}`, `dataKey` set, `getItemType` set, jumps to an already-mounted list via `listRef.current.scrollToItem({animated: false, item, viewPosition: 0.5})` from an effect.
+- **B — default start threshold.** `onStartReachedThreshold={0.5}`.
+- **C — `shouldRestorePosition`.** Pins the centered target as the sole eligible data-change anchor while one is set.
+- **D — chat example's shape.** Bare `maintainVisibleContentPosition={true}`, numeric `initialScrollIndex`, no `getItemType`, no `dataKey`.
+- **E — no `dataKey`.** Only that, alone.
+- **F — mount-path jumps (two variables).** Remounts the list carrying `initialScrollIndex` instead of calling `scrollToItem`; simultaneously removes the imperative call and forces a fresh-mount code path.
+- **G — F + C combined.**
+- **H — decisive control: delete the imperative call, nothing else.** No call, no remount, nothing else changed from A.
+- **I — the guarded deletion.** Keeps the imperative `scrollToItem` call only when the list has already rendered real, non-empty content before this jump; deletes it (behaves like H) otherwise. **Discriminator, exactly:** `chat.tsx`'s `hasRenderedNonEmptyRef` — a ref that becomes `true` the first time an effect observes `ready && messages.length > 0`, held for the `<Chat>` mount's lifetime (not reset on `datasetKey` changes, since `openAtHit` bumps the dataset on every centered jump including `hit-warm`'s). The jump-decision effect is declared *before* the ref-tracking effect, so within any single commit the decision reads the ref's value from *before* that commit. **The tracker effect is gated behind `flags.guardedDeleteImperativeScroll`** (fixed this round — see below) so it is a no-op for every other variant.
+
+### Correction made this round: the tracker effect was ungated
+
+Through review round 3, `hasRenderedNonEmptyRef`'s tracking `useEffect` ran unconditionally —
+`React.useEffect(() => { if (ready && messages.length > 0) { hasRenderedNonEmptyRef.current = true; } }, [messages, ready])`
+with no `flags` check. Because every variant shares one bundle, this meant **A/F/H's
+previously-committed nine-scenario results were measured on a build that predates this effect
+entirely** (it was added when variant I was implemented), while I's own results were measured on
+a build where it ran unconditionally for every variant including the ones whose numbers I was
+being compared against. Every "I matches H" / "I matches control A" statement in round 3's draft
+was comparing across two different builds — material specifically because the leading (still
+unconfirmed) theory for I's `hit-then-end-anchor` regression is that this same extra passive
+effect perturbs timing.
+
+**Fix:** gated the effect body behind `flags.guardedDeleteImperativeScroll`, so it is a no-op
+(returns before touching `ready`/`messages`/the ref) for every variant except I. This restores
+A-H's *behavior* to what it was before the effect existed — the hook is still declared (React
+requires the same hooks every render for one component instance), but its body does nothing for
+non-I variants, so no re-measurement of A-H was needed; only I's own results, which do exercise
+the real body, needed redoing. All nine of I's original-scenario numbers below are from the gated
+build. **Whether gating changed I's own numbers is itself informative** — see "The
+`hit-then-end-anchor` regression, bounded" below: it did correlate with a lower failure rate on
+the guard scenario, but the mechanism is not established, because gating changes nothing about
+what code executes when `flags.guardedDeleteImperativeScroll` is already `true`.
 
 ## Per-variant tables (`--lib=stock --n=30`, all nine original scenarios)
 
-Every table below is machine-regenerated directly from the committed `repro/results/<variant>-
-<scenario>.json` files (a script reads `rows[0]` from each and prints it) — not hand-transcribed —
-so a reader recomputing them from the same files reproduces them exactly. This corrects two stale
-cells a hand-edited pass of the F and G tables carried in the previous draft: F's `resize-at-end`
-`med settle` had been left at an earlier run's 773ms after corrections were re-measured (the
-committed JSON says 873ms — the ~99ms gap is exactly the same order of magnitude flagged as
-noteworthy jitter elsewhere in this document, not a new effect); G's `open-newest` `med settle`
-had a stale 774ms (committed JSON: 772ms).
+A/B/C/D/E/F/G/H's tables are unchanged from the previous draft (their behavior is provably
+unaffected by the gating fix — the tracker effect body never touched their execution before or
+after). I's table below is from the gated build; every table is regenerated directly from the
+committed `repro/results/<variant>-<scenario>.json` files.
 
 ### A — control
-
 ```
 lib=stock  n=30  variant=A
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     771ms       0
 hit-cold              30/30   0        0.3px     0.3px     754ms       3
@@ -90,20 +116,11 @@ send-at-end           30/30   0        0.0px     0.0px     771ms       0
 page-up               0/30    30       -         -         774ms       8
 resize-at-end         30/30   0        0.0px     0.0px     876ms       0
 ```
-
-5/9. Exactly reproduces `repro/BASELINE.md`'s stock table (same pass counts, same med/p95 err on
-every scenario). `resize-at-end`'s med settle here (876ms) differs from `BASELINE.md`'s original
-984ms even though every oracle figure matches exactly — `BASELINE.md` itself documents this kind
-of variance across separate `--only=` invocations as "single-digit milliseconds" (its own quoted
-wording, `BASELINE.md:65`) on `med settle` while every other figure agrees exactly; the gap seen
-here is larger than that single-digit figure but the same *kind* of jitter, not a methodology
-concern — no oracle figure (pass count, med/p95 err) ever differs.
+5/9. Reproduces `repro/BASELINE.md`'s stock table exactly on every oracle figure.
 
 ### B — default start threshold
-
 ```
 lib=stock  n=30  variant=B
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     772ms       0
 hit-cold              30/30   0        0.3px     0.3px     761ms       3
@@ -115,15 +132,11 @@ send-at-end           30/30   0        0.0px     0.0px     771ms       0
 page-up               0/30    30       -         -         778ms       8
 resize-at-end         30/30   0        0.0px     0.0px     874ms       0
 ```
-
-5/9. Identical to A on every figure (within noise). Rules out the aggressive
-`onStartReachedThreshold` as a cause of any of the four failures.
+5/9, identical to A.
 
 ### C — `shouldRestorePosition`
-
 ```
 lib=stock  n=30  variant=C
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     772ms       0
 hit-cold              30/30   0        0.3px     0.3px     760ms       3
@@ -135,34 +148,15 @@ send-at-end           30/30   0        0.0px     0.0px     772ms       0
 page-up               0/30    30       -         -         1094ms      4
 resize-at-end         30/30   0        0.0px     0.0px     981ms       0
 ```
-
-5/9. No verdict changes anywhere.
-
-**How `shouldRestorePosition` was confirmed to be consulted, not just defined:** every call is
-logged (`probe.log("shouldRestorePosition.call", {centeredId, index, item, result})`). The
-**committed** first-failure logs contain this evidence:
-
-```
-repro/results/hit-two-phase-variant-C-first-failure.json: 24 calls, 21/24 false, 3/24 true
-    last:  {centeredId:500, index:20, item:500, result:true}
-repro/results/hit-prepend-variant-C-first-failure.json:   24 calls, 24/24 false, 0/24 true
-repro/results/page-up-variant-C-first-failure.json:       24 calls, 24/24 false, 0/24 true
-```
-
-**C's null result is weaker than draft 1 stated.** In `hit-prepend` and `page-up`, **every single
-call returns `false`** — the target row (`item=500`) is never offered to the predicate at all in
-either scenario. The predicate never gets a chance to say "yes, keep this one" — it removes every
-available anchor, it does not pin the target. That also explains the corrections drop draft 1 left
-unmechanized (`hit-prepend` 9->3, `page-up` 8->4): fewer accepted anchors means less anchor-driven
-correction activity, not better targeting. **Untried and left open, not dead:** a predicate that
-returns `true` for the target when it *is* offered, and permissively `true` (not `false`) when the
-target is never offered.
+5/9. `shouldRestorePosition` confirmed consulted (committed evidence:
+`repro/results/{hit-two-phase,hit-prepend,page-up}-variant-C-first-failure.json`). In
+`hit-prepend`/`page-up` the target row is never offered to the predicate at all (24/24 calls
+`false`) — it removes every anchor rather than pinning the target. Untried and left open: a
+predicate returning `true` for the target when offered, permissive `true` fallback otherwise.
 
 ### D — chat example's shape
-
 ```
 lib=stock  n=30  variant=D
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     772ms       0
 hit-cold              30/30   0        0.3px     0.3px     757ms       3
@@ -174,20 +168,15 @@ send-at-end           30/30   0        0.0px     0.0px     776ms       0
 page-up               0/30    30       -         -         777ms       8
 resize-at-end         30/30   0        0.0px     0.0px     983ms       0
 ```
-
-4/9. `hit-warm` regresses to 10/30, flaky, median error 1938.6px, `targetMissing: false`. Numeric
-`initialScrollIndex` drops `viewPosition: 0.5`, while the scenario's assertion always grades
-against 0.5 and `hit-warm`'s jump is still driven by the imperative `scrollToItem` call (D doesn't
-touch that) which does pass 0.5 explicitly — so this is a race between two authorities disagreeing
-on `viewPosition`, at least in part, not purely "dropping `getItemType`/`dataKey`/bare-MVCP is
-harmful." The 1938.6px magnitude was not fully decomposed. D is not used as evidence for keeping
-the app's current prop shape below; E is used instead for `dataKey` specifically.
+4/9. `hit-warm` regresses to 10/30, but numeric `initialScrollIndex` drops `viewPosition: 0.5`
+while the assertion always grades against 0.5 and `hit-warm`'s jump is still imperative under D —
+this is at least partly an artifact of that mismatch, not purely evidence against dropping
+`getItemType`/`dataKey`. D is not used as evidence for the recommendation section; E is used for
+`dataKey` specifically.
 
 ### E — no `dataKey`
-
 ```
 lib=stock  n=30  variant=E
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     774ms       0
 hit-cold              30/30   0        0.3px     0.3px     768ms       3
@@ -199,15 +188,11 @@ send-at-end           30/30   0        0.0px     0.0px     773ms       0
 page-up               0/30    30       -         -         777ms       8
 resize-at-end         30/30   0        0.0px     0.0px     788ms       0
 ```
-
-5/9. Identical to A, and `hit-warm` stays 30/30 (unlike D). Isolates D's `hit-warm` regression to
-something other than `dataKey` alone.
+5/9, identical to A; `hit-warm` stays 30/30, isolating D's regression away from `dataKey` alone.
 
 ### F — mount-path jumps
-
 ```
 lib=stock  n=30  variant=F
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     771ms       0
 hit-cold              30/30   0        0.4px     0.4px     765ms       2
@@ -219,19 +204,12 @@ send-at-end           30/30   0        0.0px     0.0px     771ms       0
 page-up               30/30   0        0.2px     0.2px     777ms       5
 resize-at-end         30/30   0        0.0px     0.0px     873ms       0
 ```
-
-9/9. Corrections are real (see the corrections-fix note in the variant-mechanism history): after
-`probe.ts`'s `ARMING_EVENTS` was fixed to include `scroll.remount`, F's corrections show real
-post-landing settle activity (`hit-two-phase` 8, `hit-prepend` 6, `hit-late-images` 2, `page-up` 5,
-`hit-cold` 2, `hit-warm` 2) — closely matching H's corrections on the same scenarios. Committed
-event traces: `repro/results/{hit-two-phase,hit-prepend,hit-late-images,page-up}-variant-F-
-trace.json`, each showing one `scroll.remount` event before landing.
+9/9. Corrections are real (armed on `scroll.remount` after the `probe.ts` fix). Committed traces:
+`repro/results/{hit-two-phase,hit-prepend,hit-late-images,page-up}-variant-F-trace.json`.
 
 ### G — F + C combined
-
 ```
 lib=stock  n=30  variant=G
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     772ms       0
 hit-cold              30/30   0        0.4px     0.4px     758ms       2
@@ -243,16 +221,12 @@ send-at-end           30/30   0        0.0px     0.0px     774ms       0
 page-up               30/30   0        0.2px     0.2px     778ms       5
 resize-at-end         30/30   0        0.0px     0.0px     982ms       0
 ```
-
-9/9, indistinguishable from F alone. Committed event traces:
-`repro/results/{hit-two-phase,hit-prepend,hit-late-images,page-up}-variant-G-trace.json` (added
-this round — G flips the same four verdicts F does and had none before).
+9/9, indistinguishable from F alone. Committed traces:
+`repro/results/{hit-two-phase,hit-prepend,hit-late-images,page-up}-variant-G-trace.json`.
 
 ### H — decisive control: delete the imperative call, nothing else
-
 ```
 lib=stock  n=30  variant=H
-
 scenario              pass    missing  med err   p95 err   med settle  corrections
 open-newest           30/30   0        0.0px     0.0px     771ms       0
 hit-cold              30/30   0        0.4px     0.4px     764ms       2
@@ -264,111 +238,105 @@ send-at-end           30/30   0        0.0px     0.0px     772ms       0
 page-up               30/30   0        0.7px     0.7px     774ms       5
 resize-at-end         30/30   0        0.0px     0.0px     985ms       0
 ```
+8/9. Fixes the four original failures cleanly but regresses `hit-warm` to 1/30. Corrections here
+(and I's, below) arm on `scroll.expected`, which requests nothing — a related but not identical
+quantity to F's/A's request- or remount-armed corrections.
 
-8/9. Fixes all four originally-failing scenarios cleanly with no remount, but regresses `hit-warm`
-to 1/30 (`targetMissing` 29/30). **Note on H's corrections column:** it arms on `scroll.expected`,
-which is logged when a jump is *expected* to land on its own — no library call happens under it.
-So H's (and I's, below) corrections count post-transition settle activity, not activity following
-an actual request the library received. It is a related-but-not-identical quantity to F's/A's
-corrections (which do follow a real request or remount), even where the numbers land close
-together in this data — `probe.ts` now documents this explicitly.
-
-Committed traces: `repro/results/{hit-two-phase,hit-prepend,hit-late-images,page-up,hit-warm}-
-variant-H-{trace,first-failure}.json` (the `hit-warm` trace and first-failure files were
-byte-identical since both captured the same failing run-0; the redundant trace file was deleted
-after verifying that with `diff`, keeping only the first-failure copy).
-
-**This was the answer to review round 2's Critical 1.** H is not 9/9 — the mount-vs-live-list
-distinction is real. What review round 2 then asserted from this ("the fork still has a job") is
-addressed by variant I below, not by H alone.
-
-### I — the guarded deletion
-
+### I — the guarded deletion (gated build)
 ```
-lib=stock  n=30  variant=I
-
+lib=stock  n=30  variant=I  (gated build — see the correction note above)
 scenario              pass    missing  med err   p95 err   med settle  corrections
-open-newest           30/30   0        0.0px     0.0px     770ms       0
-hit-cold              30/30   0        0.4px     0.4px     754ms       2
-hit-warm              30/30   0        0.3px     0.3px     1028ms      3
-hit-two-phase         30/30   0        0.3px     0.3px     832ms       8
+open-newest           30/30   0        0.0px     0.0px     774ms       0
+hit-cold              30/30   0        0.4px     0.4px     757ms       2
+hit-warm              30/30   0        0.3px     0.3px     1029ms      3
+hit-two-phase         30/30   0        0.3px     0.3px     834ms       8
 hit-prepend           30/30   0        0.7px     0.7px     772ms       6
 hit-late-images       30/30   0        0.4px     0.4px     829ms       2
 send-at-end           30/30   0        0.0px     0.0px     772ms       0
-page-up               30/30   0        0.7px     0.7px     777ms       5
-resize-at-end         30/30   0        0.0px     0.0px     773ms       0
+page-up               30/30   0        0.7px     0.7px     773ms       5
+resize-at-end         30/30   0        0.0px     0.0px     975ms       0
 ```
+**9/9 on the nine original scenarios**, unchanged from the ungated measurement (as expected — the
+gate is a no-op for every variant except I, and I's own flag was already `true`). All four
+original failures close; `hit-warm` holds at parity with control A (30/30, corrections 3 = A's 3
+exactly).
 
-**9/9.** All four original failures close (`hit-two-phase` 0.3px, `hit-prepend` 0.7px,
-`hit-late-images` 0.4px, `page-up` 0.7px — matching H's own numbers on all four) *and* `hit-warm`
-holds at 30/30 (0.3px, matching control A's 0.3px almost exactly, and its corrections, 3, matches
-A's 3 exactly — the guard correctly routes `hit-warm` through the same imperative call control
-uses). No remount anywhere in this variant. This is the requested resolution: it demonstrates that
-the four-scenario fix and the `hit-warm` regression are not in tension once the call site is told
-which of the two shapes it's looking at.
+**Committed traces confirm the guard's routing directly, not just by matching numbers:**
+`repro/results/hit-warm-variant-I-trace.json` — one `scroll.request {guarded:"live"}` event.
+`repro/results/hit-two-phase-variant-I-trace.json` — one `scroll.expected {guarded:"fresh"}`
+event. These are exactly the two routing outcomes the discriminator is supposed to produce.
 
-## Fork measurements
+## Fork measurements — exactly what was run, and what it does and doesn't rule out
 
-Draft 2 asserted "the fork still has a job" resting entirely on `hit-warm` (which passes 30/30 on
-*stock* control A — nothing shown there was stock failing where the fork succeeds) and on
-`hit-then-end-anchor` (never run against the fork at all). Both gaps are closed here.
-
-```
-fork, variant A, hit-then-end-anchor: 30/30 (0.0px) — identical to stock A's 30/30
-fork, variant I, hit-warm:            30/30 (0.3px) — identical to stock I's 30/30
-fork, variant I, hit-then-end-anchor: 28/30 (0.0px med, 196.0px p95) — see below
-```
-
-The fork does not behave differently from stock on either scenario draft 2's claim rested on. This
-directly undercuts "the fork still has a job" as previously stated: there is no scenario in this
-audit where stock (correctly configured) fails and the fork succeeds.
-
-## `hit-then-end-anchor`: a scenario bug, not a second gap
-
-Review round 2's guard scenario originally showed 0/30 in every variant including F. Round 3
-review identified why: the scenario swaps to a disjoint message window
-(`loadOlder(SEND_WINDOW_NEWEST_ID + 1, PAGE)`, ids ~861-900, replacing the hit window's ~480-520)
-**without calling `bumpDataset()`**, unlike `openAtHit`, which always calls it on every
-clear-and-recenter. That handed `maintainVisibleContentPosition` an unrelated dataset under an
-unchanged `dataKey` — a scenario-side API misuse sitting underneath the entire 0/30 result,
-independent of whichever variant was under test. Fixed in `repro/scenarios.ts` by adding the
-missing `bumpDataset()` call.
+**Fork was run on 3 of the 10 scenarios in this audit, not comprehensively:**
 
 ```
-lib=stock  n=30  hit-then-end-anchor
-variant   pass    missing  med err   p95 err   med settle  corrections
-A         30/30   0        0.0px     0.0px     1322ms      22
-F         30/30   0        0.0px     0.0px     1313ms      21
-H         30/30   0        0.0px     0.0px     1314ms      20
-I         27/30   0        0.0px     196.0px   1315ms      19
+fork, variant A, hit-then-end-anchor: 30/30 (0.0px)
+fork, variant I, hit-warm:            30/30 (0.3px)
+fork, variant I, hit-then-end-anchor: 30/30 (0.0px)  [after gating; see below]
 ```
 
-A, F, and H all reach 30/30 once the scenario's own bug is fixed — the previous draft's "second,
-independent gap-shaped finding" is **dropped entirely**; it was our own scenario code, not a
-library or app gap.
+Separately, **Task 8's original fork measurement** (`repro/BASELINE.md`'s fork table,
+`repro/results/fork.json` from that task) ran the fork under the app's actual, unmodified
+orchestration — equivalent in shape to this audit's variant A, though it predates the variant
+harness — across all nine original scenarios, and found **8/9, differing from stock on three of
+them**: `hit-two-phase` (stock 0/30 -> fork 30/30), `hit-late-images` (stock 0/30 -> fork 30/30),
+`page-up` (stock 0/30, `targetMissing` -> fork 30/30), plus `hit-prepend` failing differently on
+each (stock: `targetMissing`; fork: located but 3381.7px off).
 
-**I does not reach 30/30 here — 27/30, and reproduced on a second n=30 run at 28/30.** This is a
-real, repeatable, minority-of-runs failure (`errPx: 196` in the committed first-failure detail,
-`fullyVisible: true`, not a timeout), not noise: `BASELINE.md` and every scenario measured earlier
-in this audit was uniformly 0/30 or 30/30 at n=30 with no in-between result, and this is the first
-exception. **Its mechanism is not established.** The guarded-deletion branch in `chat.tsx` isn't
-touched at all during this scenario's second half (the transition back to `centeredId ===
-undefined` and the subsequent appends) — variant I only changes behavior while a centered target
-is being set, which happens once, early, in this scenario. The most likely candidate is variant
-I's extra `useEffect` (the `hasRenderedNonEmptyRef` tracker), which fires on every `messages`/
-`ready` change for the *entire* scenario, not just the jump — one more passive effect running on
-every commit could plausibly perturb React's effect-scheduling timing enough to occasionally
-interact badly with this scenario's `wait(200)`/`wait(120)` constants, but this is a plausible
-mechanism, not a confirmed one.
+**What this does rule out:** fork+A does not behave differently from stock+A on
+`hit-then-end-anchor` (both 30/30). Fork+I does not behave differently from stock+I on `hit-warm`
+(both 30/30) or on `hit-then-end-anchor` (both 30/30, after gating).
 
-**Critically, the same 28/30 result appears when the fork library is used instead of stock**
-(`fork-I-hit-then-end-anchor`, above) — identical shape, identical magnitude. Since both libraries
-show the same behavior under the same harness-level variant I code, **this rules out a
-library-specific cause.** Whatever is producing this, it lives in the shared `chat.tsx`
-orchestration variant I adds, not in either library's own scroll-targeting logic — so it is not
-evidence for a library gap, in either direction. It is recorded here as an open, unresolved,
-minor item for whoever next touches variant I's implementation, and it does not change the
-headline classification below, because it does not implicate the library.
+**What this does NOT rule out:** fork+I was never run on the four originally-failing scenarios
+(`hit-two-phase`, `hit-prepend`, `hit-late-images`, `page-up`), nor on `open-newest`, `hit-cold`,
+`send-at-end`, or `resize-at-end`. Task 8's fork.json shows the fork *does* differ from stock on
+three scenarios under the unmodified (variant-A-shaped) configuration — meaning the fork's
+`scrollTargetSettle` measurably does something stock doesn't, at least under that configuration.
+This audit's fork+I coverage does not include re-testing those three scenarios under I, so it
+cannot state whether the fork's behavior on them changes, stays the same, or becomes redundant
+once the guarded deletion is applied. **The correct scoped claim is: on the two scenarios where
+fork+I was actually measured, it matches stock+I exactly — not that the fork is redundant
+everywhere.**
+
+## The `hit-then-end-anchor` regression, bounded
+
+Review round 2's guard scenario originally showed 0/30 in every variant, traced to a scenario bug
+(missing `bumpDataset()` on the window swap, unlike `openAtHit`), fixed in `repro/scenarios.ts`.
+With that fixed, A, F, and H all reach a clean 30/30. **I does not.**
+
+**Before gating** (two n=30 runs, both stock): 27/30, 28/30 (55/60 pass, 8.3% fail). The identical
+28/30 shape reproduced on the fork under the same, ungated build.
+
+**After gating** (three n=30 runs, stock): 29/30, 30/30, 30/30 (89/90 pass, 1.1% fail). Fork+I,
+gated build: 30/30 (single run). Every observed failure — before and after gating — shows the same
+`errPx: 196`, `fullyVisible: true` shape (not a timeout, not `targetMissing`); this is one
+consistent failure mode recurring at a lower rate, not several different failures.
+
+**What this shows and doesn't:** the failure rate measurably dropped after gating (8.3% -> 1.1%
+across the runs taken), which is worth reporting precisely as requested — but it does not, on its
+own, establish gating as the cause. Gating changes nothing about what code executes when
+`flags.guardedDeleteImperativeScroll` is already `true` (which it is throughout every I run,
+gated or not) — the tracker effect's real body runs identically either way for I itself; gating
+only changes what happens for *other* variants. If gating nonetheless correlates with a lower
+failure rate for I, the most honest available explanations are (a) coincidence across a small
+number of n=30 samples (90 vs 60 runs is not a large sample for a ~5-10% base rate), or (b) some
+indirect effect of the changed function/effect identity on scheduling that this audit did not
+investigate further. **This audit does not resolve which.** The regression is reduced, not shown
+gone, and not mechanistically explained even after the one fix available to test.
+
+Under this scenario, I and H issue *identical* library calls during the segment that differs
+between variants — one `scroll.expected {guarded:"fresh"}` event, no `scroll.request`, matching
+H's mechanism exactly — while H is clean 30/30 on this scenario and I is not. The only code
+difference between I and H is the tracker effect itself. That the effect is the load-bearing
+difference is a reasonable inference from the code; that it is the *cause* of the regression is
+not established by anything measured here.
+
+**Is variant I safe to ship, given shipping it means adding this tracker effect to the app?** Not
+established either way by this audit. The regression is small (1-8% depending on the sample), is
+not eliminated by the one fix tested, and appears identically on both libraries (ruling out a
+library-specific cause but not identifying the actual one). An honest answer here is
+"undetermined" — the reduction after gating is a real, reported observation, not a confirmed fix.
 
 ## Summary table: scenario x variant (pass/fail)
 
@@ -386,61 +354,75 @@ resize-at-end         PASS  PASS  PASS  PASS  PASS  PASS  PASS  PASS  PASS
 
 totals                5/9   5/9   5/9   4/9   5/9   9/9   9/9   8/9   9/9
 
-hit-then-end-anchor (post-bumpDataset-fix, A/F/H/I; fork checked for A and I):
-  stock: PASS  PASS  PASS  27/30(FAIL, reproduced 28/30)
-  fork:  A=30/30 PASS, I=28/30 (FAIL, matches stock's shape)
+hit-then-end-anchor (post-bumpDataset-fix; A/F/H/I stock, plus fork at A and I):
+  stock A: 30/30   stock F: 30/30   stock H: 30/30
+  stock I (gated): 29/30, 30/30, 30/30 across three n=30 runs (89/90, 1.1% fail)
+  fork  A: 30/30   fork  I (gated): 30/30
 ```
 
 ## Final classification
 
-**I is 9/9. No library change is needed for any of the nine original scenarios.**
+**Accurate headline: I is 9/9 on the nine original scenarios, with a small, real, unresolved
+regression (89/90 pass, 1.1% fail across gated runs; higher, 8.3%, before gating) on the guard
+scenario added specifically to cover this variant's blind spot.** Not bare "9/9" — the guard
+exists because the original nine don't test the shape where `centeredId` transitions back to
+`undefined` after a jump, and I is the one variant in this audit that does not pass it cleanly.
 
-- **`hit-two-phase`, `hit-prepend`, `hit-late-images`, `page-up`** (the four original failures):
-  **API misuse.** The app's imperative `scrollToItem` call is redundant on these four scenarios —
-  they all reach the centered jump before the list has ever rendered real content, and the
-  library's own freshData bootstrap already lands correctly without help. Deleting the call for
-  this shape (I, matching H) fixes all four cleanly.
-- **`hit-warm`:** **not a library gap.** Passes 30/30 under control A (stock, using the app's
-  current imperative call, unconditionally). Passes 30/30 under I (the guarded deletion, which
-  keeps the call for exactly this shape). Passes 30/30 under the fork with I applied — identical
-  to stock. The only variant that breaks it is H, which deletes the call *unconditionally* — a
-  blanket deletion no one is proposing to ship. Draft 2's "real library-level asymmetry, i.e. a
-  library gap" was built on H alone and is **retracted**: a correctly guarded call site does not
-  encounter this problem on stock, and the fork does nothing different here either.
-- **`hit-then-end-anchor`:** not classified as a library or app gap. Its original 0/30 was the
-  scenario's own bug (missing `bumpDataset()`), now fixed; A/F/H all reach 30/30 with the fix. I
-  shows an unresolved 27-28/30 result that reproduces identically on stock and fork, which rules
-  out a library cause but does not yet have a confirmed one — flagged as an open implementation
-  item for variant I's harness code, not a library gap, and not evidence for keeping any fork code.
+- **`hit-two-phase`, `hit-prepend`, `hit-late-images`, `page-up`:** API misuse. The app's
+  imperative `scrollToItem` call is redundant when the list hasn't yet rendered real content;
+  deleting it for this shape (I, matching H) fixes all four.
+- **`hit-warm`:** not a library gap on the evidence gathered. Passes 30/30 under control A, under
+  I, and under fork+I. Only an *unconditional* deletion (H) breaks it — no one is proposing to
+  ship that.
+- **`hit-then-end-anchor`:** its original 0/30 was a scenario bug, fixed; A/F/H are clean 30/30.
+  I's residual regression is real, small, reduced-but-not-eliminated by gating, reproduces
+  identically on stock and fork (ruling out a library-specific cause), and its mechanism is
+  **not established** by this audit. It is not classified as a library gap (both libraries show
+  it identically) and not classified as resolved.
 
-**No scenario in this audit shows the fork behaving differently from a correctly-configured stock
-build.** The two fork measurements taken specifically to test draft 2's claim (`hit-warm` under I,
-`hit-then-end-anchor` under A) both match stock exactly. **The entire fork diff
-(`scrollTargetSettle`) is a deletion candidate.** What remains before acting on that:
+**The fork diff is a deletion candidate for the four scenarios where fork+A and stock+A(guarded)
+were actually compared and matched, and for `hit-warm` and `hit-then-end-anchor` where fork+I was
+directly measured against stock+I. It is not shown to be a deletion candidate everywhere** — this
+audit did not re-test the fork under I on the three scenarios (`hit-two-phase`, `hit-late-images`,
+`page-up`, plus `hit-prepend`'s different-failure-mode case) where Task 8 already established the
+fork does something stock+A doesn't. Whether the guarded deletion makes the fork's behavior on
+those three redundant, or whether the fork was doing something orthogonal to the imperative-call
+problem, is untested.
 
-1. Confirm the guarded-deletion approach ports into the real app — it needs an actual "has this
-   thread view ever rendered messages before" signal, which this audit argues is computable but
-   did not build in the app itself (only in the harness).
-2. Resolve or at least further investigate variant I's unexplained `hit-then-end-anchor`
-   flakiness before treating I's implementation as a finished reference — it is not a
-   library-blocking issue (both libraries show it identically) but it is an open loose end in the
-   harness code the app-side implementation should not blindly copy without understanding.
+**App portability of the guard is unvalidated — do not read this audit as having built or proven
+the discriminator for the real app.** Two preconditions the app-side implementation must satisfy,
+named explicitly rather than left implicit in "a boolean the thread screen sets":
+
+1. **The tracker must be declared *after* the jump-decision effect in the same component,** so the
+   decision reads the ref's value from before the current commit, not the current commit's own
+   arriving content. A tracker declared earlier, a store-level flag set during a render phase, or
+   any implementation that makes the "has rendered" signal available *within the same commit* as
+   the content that produces it, breaks the discriminator: it would read `true` at
+   `hit-two-phase`'s decision commit (that commit is itself the first arrival of real, non-empty
+   content) and keep the imperative call for exactly the shape that needs it deleted.
+2. **Messages and the centered target must arrive in the same commit.** This harness's `openAtHit`
+   batches `setMessages(...)` and `setCentered(...)` together; the app's real data sources are
+   `useConversationCenter()` and `useThreadListData()` — two different stores. If real messages
+   land one commit *before* `centeredOrdinal` is set (a plausible sequencing given they're
+   separate stores), the ref flips to `true` on that earlier commit, and the guard keeps the
+   imperative call on the fresh-list shape it's supposed to delete it for.
+
+Neither precondition was checked against the app's actual store/effect structure — that
+investigation is out of scope for this task. The conclusion is: **the guarded-deletion mechanism
+is validated in this harness and is a promising candidate, but the fork diff should be treated as
+a deletion candidate pending app-side validation of the guard, not as a settled deletion.**
 
 ## Variants that could not be expressed through the public API
 
 None. All nine variants (A-I) were fully expressible as prop and orchestration changes in
-`repro/chat.tsx`/`repro/app.tsx`/`repro/scenarios.ts`; `src/` was never touched for any
-measurement in this document.
+`repro/chat.tsx`/`repro/app.tsx`/`repro/scenarios.ts`; `src/` was never touched.
 
-## Caveats on a remount-based approach (F/G), if considered instead of I
+## Caveats on a remount-based approach (F/G), if I's guard cannot be ported safely
 
-I is 9/9 without any remount, so this section is no longer the primary recommendation, but it
-remains relevant if a guarded deletion turns out not to be portable to the real app for some
-reason not surfaced here. A full LegendList remount discards the previous DOM and recycled
-containers; every row re-renders from scratch. In the real Keybase app, a keyed remount at either
-call site (open-thread-on-a-hit, or jump-to-hit-from-an-open-thread) would discard
+A full LegendList remount discards the previous DOM and recycled containers; every row re-renders
+from scratch. In the real Keybase app, a keyed remount at either call site would discard
 `HighlightableRow`'s local state (`settledFor`/`hoveredFor`) and restart the highlight animation —
-a specific, concrete cost, not a vague "possibly a flash."
+a specific, concrete cost.
 
 ## Recommended changes to the Keybase app's list configuration
 
@@ -449,37 +431,29 @@ true}}`, `maintainScrollAtEnd={centered ? false : true}`, `dataKey`, `alignItems
 `initialScrollAtEnd`/`initialScrollIndex`, and issues `scrollToItem({animated:false,
 viewPosition:0.5})` from an effect.
 
-- **Primary recommendation: adopt the guarded deletion (variant I).** Keep the imperative
-  `scrollToItem` call only when the currently-open thread view has already rendered real message
-  content before this jump; skip it when this is the thread view's first real content. This is a
-  small, targeted change (not a remount) that measured 9/9 on stock and matches the fork exactly
-  on both scenarios that motivated keeping fork code. The discriminator the harness uses
-  (`hasRenderedNonEmptyRef`, see the variant-I definition above) is directly portable: a boolean
-  the thread screen sets the first time it renders any real message, held for the screen's
-  lifetime.
-- **No change: `onStartReachedThreshold`.** Variant B (default `0.5`) was statistically identical
-  to control.
-- **No change: `maintainVisibleContentPosition={{data: true}}`.** Confirmed not misuse. Adding
-  `shouldRestorePosition` (variant C) changes corrections behavior on two scenarios but no
-  verdict; the untried permissive-fallback shape remains open, not dead, but is not required by
-  anything measured here. **Do not conclude `shouldRestorePosition` explains the fork's Task 8
-  improvement** on `hit-two-phase`/`hit-late-images` — C alone left both failing identically to
-  control.
-- **No change: `dataKey`.** Variant E (dropped alone) was statistically identical to control.
-- **No change: `getItemType`, object-form `initialScrollIndex`, `alignItemsAtEnd`,
-  `maintainScrollAtEnd` conditional.** No variant cleanly isolated any of these as a cause of the
-  four failures; D's regression is not clean evidence here (see the D section).
-- **Fallback only if the guarded deletion cannot be ported:** F's remount, uniformly. Also
-  measured 9/9, but pays a real, avoidable cost (state loss, animation restart) on every jump,
-  including the ones a bare deletion would have handled for free. Prefer the guarded deletion.
+- **Primary candidate, pending app-side validation: the guarded deletion (variant I).** Keep the
+  imperative `scrollToItem` call only when the currently-open thread view has already rendered
+  real message content before this jump; skip it otherwise. Validate the two preconditions above
+  against the app's actual `useConversationCenter()`/`useThreadListData()` sequencing before
+  relying on this — this audit did not check them. Also unresolved before shipping: the
+  `hit-then-end-anchor` regression's cause, at whatever rate it turns out to occur at in the real
+  app's effect timing.
+- **No change: `onStartReachedThreshold`, `maintainVisibleContentPosition={{data: true}}`,
+  `dataKey`, `getItemType`, object-form `initialScrollIndex`, `alignItemsAtEnd`,
+  `maintainScrollAtEnd` conditional.** No variant isolated any of these as a cause of the four
+  failures (see B, C, E, D's sections above for the specific caveats on each).
+- **Fallback only if the guarded deletion cannot be validated for the app:** F's remount,
+  uniformly. Measured 9/9 on the original nine (no guard-scenario regression observed under F),
+  but pays a real cost (state loss, animation restart) on every jump.
 
 ## Consequence for the fork
 
-**The entire fork diff is now a deletion candidate**, not just the slice affecting the four
-originally-failing scenarios. Draft 2's basis for keeping any of it (`hit-warm`'s behavior under
-an *unconditional* deletion, and an untested guard scenario) does not survive: `hit-warm` passes
-identically under stock control, stock with the guarded deletion, and the fork; the guard scenario
-passes identically under stock control and the fork once its own bug is fixed. Task 9 should
-re-run the fork's 8/9 comparison against an app-side guarded deletion (variant I's mechanism, or
-its real-app equivalent) rather than assuming any of `scrollTargetSettle` is required — this
-audit's data says it is not, for every scenario measured against both libraries.
+Scoped to what was measured: the slice of the fork's value covering `hit-warm` and
+`hit-then-end-anchor` is not shown to be necessary — stock with the guarded deletion (and the
+fork with the same guarded deletion) both handle these cleanly. The slice covering the four
+originally-failing scenarios (Task 8's basis for `scrollTargetSettle`) was not re-tested under the
+guarded deletion against the fork in this round — Task 9 should do that comparison specifically
+(fork+I vs. stock+I on `hit-two-phase`/`hit-prepend`/`hit-late-images`/`page-up`) before treating
+any part of the fork diff as removable. Until app-side validation of the guard's two preconditions
+happens, and until `hit-then-end-anchor`'s regression is understood, "delete the fork diff" is a
+candidate conclusion, not a settled one.
