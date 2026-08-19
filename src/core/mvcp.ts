@@ -1,4 +1,9 @@
 import { IsNewArchitecture } from "@/constants-platform";
+import {
+    resolveScrollTargetAnchor,
+    type ScrollTargetAnchor,
+    settleScrollTargetAnchor,
+} from "@/core/scrollTargetAnchor";
 import { Platform } from "@/platform/Platform";
 import { getContentSize } from "@/state/getContentSize";
 import { peek$, type StateContext } from "@/state/state";
@@ -254,8 +259,12 @@ export function prepareMVCP(
     let prevPosition: number | undefined;
     let targetId: string | undefined;
     const idsInViewWithPositions: { id: string; position: number }[] = [];
-    const scrollTarget = scrollingTo?.index;
-    const scrollingToViewPosition = scrollingTo?.viewPosition;
+    // The scroll target keeps its anchor for a bounded window after the scroll completes, because
+    // that is where most of the measurement it was aimed with actually lands.
+    const targetAnchor: ScrollTargetAnchor | undefined = resolveScrollTargetAnchor(ctx, now);
+    const activeScrollTarget = scrollingTo?.index;
+    const scrollTarget = activeScrollTarget ?? (targetAnchor ? state.indexByKey.get(targetAnchor.id) : undefined);
+    const scrollingToViewPosition = scrollingTo?.viewPosition ?? targetAnchor?.viewPosition;
     const isEndAnchoredScrollTarget =
         scrollTarget !== undefined &&
         state.props.data.length > 0 &&
@@ -269,7 +278,7 @@ export function prepareMVCP(
     if (shouldMVCP) {
         // Once native MVCP is handing control back, keep feeding that same pending adjust until the
         // platform settles instead of starting a second MVCP cycle from partially updated scroll state.
-        if (!isWeb && state.pendingNativeMVCPAdjust && scrollTarget === undefined) {
+        if (!isWeb && state.pendingNativeMVCPAdjust && activeScrollTarget === undefined) {
             maybeApplyPredictedNativeMVCPAdjust(ctx);
             return undefined;
         }
@@ -403,16 +412,25 @@ export function prepareMVCP(
                 }
             }
 
-            if (scrollingToViewPosition && scrollingToViewPosition > 0) {
-                const newSize = getItemSize(ctx, targetId!, scrollTarget!, state.props.data[scrollTarget!]);
-                const prevSize = scrollingTo?.itemSize;
+            if (scrollingToViewPosition && scrollingToViewPosition > 0 && scrollTarget !== undefined && targetId) {
+                const newSize = getItemSize(ctx, targetId, scrollTarget, state.props.data[scrollTarget]);
+                const prevSize = scrollingTo?.itemSize ?? targetAnchor?.itemSize;
                 if (newSize !== undefined && prevSize !== undefined && newSize !== prevSize) {
                     const diff = newSize - prevSize;
                     if (diff !== 0) {
-                        positionDiff += diff * scrollingToViewPosition!;
-                        scrollingTo.itemSize = newSize;
+                        positionDiff += diff * scrollingToViewPosition;
+                        if (scrollingTo) {
+                            scrollingTo.itemSize = newSize;
+                        }
+                        if (targetAnchor) {
+                            targetAnchor.itemSize = newSize;
+                        }
                     }
                 }
+            }
+
+            if (targetAnchor) {
+                settleScrollTargetAnchor(state, targetAnchor, positionDiff);
             }
 
             updateAnchorLock(state, {

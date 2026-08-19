@@ -1,6 +1,8 @@
 import { updateAdaptiveRender } from "@/core/adaptiveRender";
 import { doMaintainScrollAtEnd, finishMaintainScrollAtEnd } from "@/core/doMaintainScrollAtEnd";
+import { isImperativeScrollSettling } from "@/core/imperativeScrollSettle";
 import { resolvePendingNativeMVCPAdjust } from "@/core/mvcp";
+import { clearScrollTargetAnchor } from "@/core/scrollTargetAnchor";
 import { flushSync } from "@/platform/flushSync";
 import type { StateContext } from "@/state/state";
 import { checkThresholds } from "@/utils/checkThresholds";
@@ -85,8 +87,14 @@ export function updateScroll(
     const allowedEdge = isUserScrollEvent ? beginReachedEdgeUserScroll(ctx, newScroll - prevScroll) : undefined;
     const didResolvePendingNativeMVCPAdjust = resolvePendingNativeMVCPAdjust(ctx, newScroll);
     const scrollLength = state.scrollLength;
+    // A delta larger than the viewport is only a reader taking over if it is not the landing of a
+    // scroll the app just asked for.
     const isLargeUserScrollJump =
-        scrollLength > 0 && scrollingTo === undefined && scrollDelta > scrollLength && !state.pendingNativeMVCPAdjust;
+        scrollLength > 0 &&
+        scrollingTo === undefined &&
+        scrollDelta > scrollLength &&
+        !state.pendingNativeMVCPAdjust &&
+        !isImperativeScrollSettling(state, currentTime);
     const scrollVelocity = getScrollVelocity(state);
     updateAdaptiveRender(ctx, scrollVelocity, { forceLight: isLargeUserScrollJump });
     const lastCalculated = state.scrollLastCalculate;
@@ -126,6 +134,7 @@ export function updateScroll(
 
         if (isLargeUserScrollJump) {
             state.mvcpAnchorLock = undefined;
+            clearScrollTargetAnchor(state);
             state.pendingNativeMVCPAdjust = undefined;
             state.userScrollAnchorReset = { keys: new Set() };
             state.scheduledWork.cancel("mvcpRecalculate");

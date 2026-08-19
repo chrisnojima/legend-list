@@ -57,6 +57,7 @@ export interface MaintainScrollAtEndNormalized {
     onItemLayout: boolean;
     onDataChange: boolean;
     onFooterLayout: boolean;
+    onHeaderLayout: boolean;
 }
 
 export interface ThresholdSnapshot {
@@ -74,9 +75,13 @@ export interface ScrollTarget {
     index?: number;
     isInitialScroll?: boolean;
     itemSize?: number;
+    /** Key of the item at `index` when the request was made, so the target survives index shifts. */
+    key?: string;
     offset: number;
     precomputedWithViewOffset?: boolean;
     targetOffset?: number;
+    /** Set when a touch moved the list away from this target, so it stops re-aiming. */
+    userInterrupted?: boolean;
     viewOffset?: number;
     viewPosition?: number;
 }
@@ -243,7 +248,20 @@ export interface InternalState {
     scrollForNextCalculateItemsInView: { top: number | null; bottom: number | null } | undefined;
     scrollHistory: Array<{ scroll: number; time: number }>;
     scrollingTo?: InternalScrollTarget | undefined;
+    /** Deadline until which scroll events are still attributable to a just-finished imperative scroll. */
+    imperativeScrollSettlingUntil?: number | undefined;
     scrollTargetPinnedRange?: { end: number; start: number };
+    scrollTargetAnchor?:
+        | {
+              corrections: number;
+              expiresAt: number;
+              id: string;
+              itemSize?: number;
+              maxExpiresAt: number;
+              quietPasses: number;
+              viewPosition: number;
+          }
+        | undefined;
     horizontalRTLScrollType?: "normal" | "inverted" | "negative";
     scrollLastCalculate?: number;
     scrollLength: number;

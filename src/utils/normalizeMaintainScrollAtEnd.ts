@@ -9,6 +9,7 @@ function normalizeMaintainScrollAtEndOn(
         animated: false,
         onDataChange: hasExplicitOn ? (on?.dataChange ?? false) : true,
         onFooterLayout: hasExplicitOn ? (on?.footerLayout ?? false) : true,
+        onHeaderLayout: hasExplicitOn ? (on?.headerLayout ?? false) : true,
         onItemLayout: hasExplicitOn ? (on?.itemLayout ?? false) : true,
         onLayout: hasExplicitOn ? (on?.layout ?? false) : true,
     };

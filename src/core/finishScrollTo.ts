@@ -1,7 +1,9 @@
 import { addTotalSize } from "@/core/addTotalSize";
 import { cancelScrollCompletionChecks } from "@/core/cancelImperativeScroll";
 import { finishInitialScroll } from "@/core/finishInitialScroll";
+import { markImperativeScrollSettling } from "@/core/imperativeScrollSettle";
 import { recalculateSettledScroll } from "@/core/recalculateSettledScroll";
+import { beginScrollTargetAnchor } from "@/core/scrollTargetAnchor";
 import { PlatformAdjustBreaksScroll } from "@/platform/Platform";
 import type { StateContext } from "@/state/state";
 
@@ -16,8 +18,13 @@ export function finishScrollTo(ctx: StateContext) {
         const scrollingTo = state.scrollingTo;
 
         state.scrollHistory.length = 0;
+        // The scroller still has this scroll's own landing event to deliver.
+        markImperativeScrollSettling(state);
         state.scrollingTo = undefined;
         state.scrollTargetPinnedRange = undefined;
+        // The rows above the target are still measuring in, so keep MVCP anchored on it rather than
+        // handing the position straight back to the ordinary visible anchor.
+        beginScrollTargetAnchor(ctx, scrollingTo);
 
         if (state.pendingTotalSize !== undefined) {
             addTotalSize(ctx, null, state.pendingTotalSize);

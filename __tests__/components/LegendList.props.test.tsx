@@ -201,6 +201,63 @@ describe("LegendList props behavior", () => {
         rendered.unmount();
     });
 
+    it("marks an in-flight imperative scroll interrupted when a native drag begins", async () => {
+        const data = [{ id: "item-1", label: "Alpha" }];
+        const renderItem = ({ item }: { item: { label: string } }) => <Text>{item.label}</Text>;
+        const { LegendList } = await import("../../src/components/LegendList?props-test-drag-interrupts-target");
+
+        const rendered = render(
+            <LegendList
+                data={data}
+                estimatedItemSize={100}
+                keyExtractor={(item: { id: string }) => item.id}
+                recycleItems={false}
+                renderItem={renderItem}
+            />,
+        );
+        const state = await getStateFromRender();
+        const scrollingTo = { animated: true, index: 0, offset: 100, viewPosition: 0.5 };
+        state.scrollingTo = scrollingTo;
+        state.imperativeScrollSettlingUntil = Date.now() + 1000;
+
+        act(() => {
+            lastListProps.onInternalScrollBeginDrag({ nativeEvent: {} });
+        });
+
+        // The request still owns completion, it just stops re-aiming at a target the reader left.
+        expect(state.scrollingTo).toBe(scrollingTo);
+        expect(scrollingTo.userInterrupted).toBe(true);
+        // A real gesture ends the window in which large deltas are attributed to a finished scroll.
+        expect(state.imperativeScrollSettlingUntil).toBeUndefined();
+        rendered.unmount();
+    });
+
+    it("leaves an initial scroll alone when a native drag begins", async () => {
+        const data = [{ id: "item-1", label: "Alpha" }];
+        const renderItem = ({ item }: { item: { label: string } }) => <Text>{item.label}</Text>;
+        const { LegendList } = await import("../../src/components/LegendList?props-test-drag-keeps-initial-target");
+
+        const rendered = render(
+            <LegendList
+                data={data}
+                estimatedItemSize={100}
+                keyExtractor={(item: { id: string }) => item.id}
+                recycleItems={false}
+                renderItem={renderItem}
+            />,
+        );
+        const state = await getStateFromRender();
+        const scrollingTo = { animated: false, index: 0, isInitialScroll: true, offset: 100 };
+        state.scrollingTo = scrollingTo;
+
+        act(() => {
+            lastListProps.onInternalScrollBeginDrag({ nativeEvent: {} });
+        });
+
+        expect(scrollingTo.userInterrupted).toBeUndefined();
+        rendered.unmount();
+    });
+
     it("does not cancel another imperative scroll while end maintenance is only pending", async () => {
         const data = [{ id: "item-1", label: "Alpha" }];
         const renderItem = ({ item }: { item: { label: string } }) => <Text>{item.label}</Text>;

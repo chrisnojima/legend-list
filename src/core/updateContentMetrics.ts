@@ -2,6 +2,8 @@ import { Platform } from "@/platform/Platform";
 import { peek$, type StateContext, set$ } from "@/state/state";
 import type { Insets } from "@/types.base";
 import { requestAdjust } from "@/utils/requestAdjust";
+import { handleBootstrapInitialScrollLayoutChange } from "./bootstrapInitialScroll";
+import { doMaintainScrollAtEnd } from "./doMaintainScrollAtEnd";
 import { maybeUpdateAnchoredEndSpace } from "./updateAnchoredEndSpace";
 import { updateContentMetricsState } from "./updateContentMetricsState";
 
@@ -50,6 +52,16 @@ export function setHeaderSize(ctx: StateContext, size: number) {
         // is a real content shift above the viewport and should preserve MVCP.
         if (hasMeasuredOrEstimatedHeaderBaseline && shouldAdjustForHeaderSizeChange(ctx, previousHeaderSize, size)) {
             requestAdjust(ctx, size - previousHeaderSize);
+        } else {
+            // Nothing compensated the shift, so everything below the header just moved by the
+            // difference and whatever was holding a position has to be re-resolved against it.
+            // The bootstrap re-aim self-gates on there being an initial scroll to re-aim, and it is
+            // the only authority in that window: the end anchor declines a scroll issued while
+            // another one is in flight and never replays the one it dropped.
+            handleBootstrapInitialScrollLayoutChange(ctx);
+            if (state.props.maintainScrollAtEnd?.onHeaderLayout) {
+                doMaintainScrollAtEnd(ctx);
+            }
         }
     }
 

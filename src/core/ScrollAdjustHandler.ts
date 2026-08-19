@@ -1,8 +1,7 @@
 import { calculateItemsInView } from "@/core/calculateItemsInView";
-import { calculateOffsetForIndex } from "@/core/calculateOffsetForIndex";
-import { calculateOffsetWithOffsetPosition } from "@/core/calculateOffsetWithOffsetPosition";
 import { checkFinishedScroll } from "@/core/checkFinishedScroll";
 import { clampScrollOffset } from "@/core/clampScrollOffset";
+import { getScrollTargetOffset } from "@/core/scrollTargetOffset";
 import { PlatformAdjustBreaksScroll } from "@/platform/Platform";
 import { type StateContext, set$ } from "@/state/state";
 import type { ScrollTarget } from "@/types.internal";
@@ -50,11 +49,7 @@ export class ScrollAdjustHandler {
                 // If we have a scroll target with an index, recalculate the correct
                 // position based on where the target item is NOW, not just add pendingAdjust
                 if (scrollTarget?.index !== undefined) {
-                    // Get the target item's current position
-                    const currentOffset = calculateOffsetForIndex(this.ctx, scrollTarget.index);
-                    // Apply viewOffset and viewPosition to get the final scroll position
-                    targetScroll = calculateOffsetWithOffsetPosition(this.ctx, currentOffset, scrollTarget);
-                    targetScroll = clampScrollOffset(this.ctx, targetScroll, scrollTarget);
+                    targetScroll = getScrollTargetOffset(this.ctx, scrollTarget);
                 } else {
                     // Fallback: just add pending to current scroll
                     targetScroll = clampScrollOffset(this.ctx, state.scroll + pending);

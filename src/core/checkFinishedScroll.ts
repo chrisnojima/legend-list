@@ -1,8 +1,7 @@
-import { calculateOffsetForIndex } from "@/core/calculateOffsetForIndex";
-import { calculateOffsetWithOffsetPosition } from "@/core/calculateOffsetWithOffsetPosition";
 import { clampScrollOffset } from "@/core/clampScrollOffset";
 import { finishScrollTo } from "@/core/finishScrollTo";
 import { initialScrollCompletion, initialScrollWatchdog } from "@/core/initialScrollSession";
+import { getScrollTargetOffset, isEndAlignedLastItemTarget } from "@/core/scrollTargetOffset";
 import { Platform } from "@/platform/Platform";
 import { getContentSize } from "@/state/getContentSize";
 import type { StateContext } from "@/state/state";
@@ -97,27 +96,22 @@ function shouldFinishInitialZeroTargetScroll(ctx: StateContext) {
     );
 }
 
-function isEndAlignedLastItemTarget(ctx: StateContext, scrollingTo: ActiveScrollTarget) {
-    return scrollingTo.index === ctx.state.props.data.length - 1 && scrollingTo.viewPosition === 1;
-}
-
-function getCurrentTargetOffset(ctx: StateContext, scrollingTo: ActiveScrollTarget) {
-    const index = scrollingTo.index;
-    const shouldRecomputeEndTarget = isEndAlignedLastItemTarget(ctx, scrollingTo);
-    const requestedTargetOffset =
-        shouldRecomputeEndTarget && index !== undefined
-            ? calculateOffsetWithOffsetPosition(ctx, calculateOffsetForIndex(ctx, index), scrollingTo)
-            : (scrollingTo.targetOffset ??
-              clampScrollOffset(ctx, scrollingTo.offset - (scrollingTo.viewOffset || 0), scrollingTo));
-
-    return clampScrollOffset(ctx, requestedTargetOffset, scrollingTo);
+// True when the list is sitting where the request last aimed it, so the only thing left between it
+// and its target is that the target moved.
+function didReachRequestedScrollOffset(ctx: StateContext, scrollingTo: ActiveScrollTarget) {
+    const requestedOffset = clampScrollOffset(
+        ctx,
+        scrollingTo.targetOffset ?? scrollingTo.offset - (scrollingTo.viewOffset || 0),
+        scrollingTo,
+    );
+    return Math.abs(ctx.state.scrollPending - requestedOffset) < 1;
 }
 
 function getResolvedScrollCompletionState(ctx: StateContext, scrollingTo: ActiveScrollTarget) {
     const { state } = ctx;
     const scroll = state.scrollPending;
     const adjust = state.scrollAdjustHandler.getAdjust();
-    const clampedTargetOffset = getCurrentTargetOffset(ctx, scrollingTo);
+    const clampedTargetOffset = getScrollTargetOffset(ctx, scrollingTo);
     const maxOffset = clampScrollOffset(ctx, scroll, scrollingTo);
     const diff1 = Math.abs(scroll - clampedTargetOffset);
     const adjustedTargetOffset = clampedTargetOffset + adjust;
@@ -221,6 +215,18 @@ export function checkFinishedScrollFallback(ctx: StateContext) {
                 isEndAlignedLastItemTarget(ctx, isStillScrollingTo) &&
                 !completionState.isAtResolvedTarget &&
                 numChecks <= maxChecks;
+            // An index target's offset is re-derived from where its item is now, so a scroll that
+            // was aimed with estimated sizes can be short of it once those rows measure. Re-issue
+            // it at the live offset, but only once the list actually reached the offset it was last
+            // aimed at: stopping anywhere else means something interrupted the scroll, and taking
+            // over then would fight whatever did. Bounded by maxChecks so this always terminates.
+            const shouldRetryUnalignedIndexScroll =
+                !isStillScrollingTo.isInitialScroll &&
+                !isStillScrollingTo.userInterrupted &&
+                isStillScrollingTo.index !== undefined &&
+                !completionState.isAtResolvedTarget &&
+                didReachRequestedScrollOffset(ctx, isStillScrollingTo) &&
+                numChecks <= maxChecks;
             if (shouldRetrySilentInitialNativeScroll) {
                 const targetOffset =
                     getInitialScrollWatchdogTargetOffset(state) ?? isStillScrollingTo.targetOffset ?? 0;
@@ -235,7 +241,11 @@ export function checkFinishedScrollFallback(ctx: StateContext) {
                     "checkFinishedScrollRetryFrame",
                 );
                 scheduleFallbackCheck(SILENT_INITIAL_SCROLL_RETRY_DELAY_MS);
-            } else if (shouldRetryUnalignedEndScroll) {
+            } else if (shouldRetryUnalignedEndScroll || shouldRetryUnalignedIndexScroll) {
+                if (shouldRetryUnalignedIndexScroll) {
+                    // The re-aimed offset is the request now, so the next pass measures against it.
+                    isStillScrollingTo.targetOffset = completionState.clampedTargetOffset;
+                }
                 scrollToFallbackOffset(ctx, completionState.clampedTargetOffset);
                 scheduleFallbackCheck(100);
             } else if (
