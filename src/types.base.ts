@@ -508,6 +508,12 @@ export interface AlwaysRenderConfig {
 export interface MaintainScrollAtEndOnOptions {
     dataChange?: boolean;
     footerLayout?: boolean;
+    /**
+     * Keep the list pinned to the end when the header changes size. A header that measures larger
+     * than its estimate pushes every item down, which leaves a list that had already scrolled to
+     * its end short of it by the difference.
+     */
+    headerLayout?: boolean;
     itemLayout?: boolean;
     layout?: boolean;
 }

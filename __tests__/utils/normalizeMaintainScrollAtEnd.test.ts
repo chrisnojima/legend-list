@@ -14,6 +14,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: false,
             onDataChange: true,
             onFooterLayout: true,
+            onHeaderLayout: true,
             onItemLayout: true,
             onLayout: true,
         });
@@ -24,6 +25,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: true,
             onDataChange: true,
             onFooterLayout: true,
+            onHeaderLayout: true,
             onItemLayout: true,
             onLayout: true,
         });
@@ -34,6 +36,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: true,
             onDataChange: false,
             onFooterLayout: false,
+            onHeaderLayout: false,
             onItemLayout: false,
             onLayout: true,
         });
@@ -41,6 +44,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: false,
             onDataChange: false,
             onFooterLayout: false,
+            onHeaderLayout: false,
             onItemLayout: false,
             onLayout: true,
         });
@@ -50,6 +54,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: false,
             onDataChange: true,
             onFooterLayout: true,
+            onHeaderLayout: false,
             onItemLayout: true,
             onLayout: false,
         });
@@ -57,6 +62,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: false,
             onDataChange: true,
             onFooterLayout: false,
+            onHeaderLayout: false,
             onItemLayout: true,
             onLayout: false,
         });
@@ -67,6 +73,7 @@ describe("normalizeMaintainScrollAtEnd", () => {
             animated: false,
             onDataChange: true,
             onFooterLayout: true,
+            onHeaderLayout: true,
             onItemLayout: true,
             onLayout: true,
         });

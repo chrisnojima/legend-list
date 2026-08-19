@@ -1,6 +1,7 @@
 ## 3.3.7
 
 - Fix: `scrollToIndex` with a `viewPosition` now lands on the item's real position: the request stays live until the list reaches it, so a scroll aimed with estimated sizes is re-issued at where the target ends up once the rows above it measure, and it follows the item if data moves it. A touch during the scroll stops it re-aiming.
+- Fix: A `ListHeaderComponent` measuring larger than its estimate no longer leaves a list that started at its end short of it. If you use an explicit `maintainScrollAtEnd.on` config, add `headerLayout` to opt into header size changes.
 - Fix: Recycled rows no longer briefly show content from the wrong item when data is prepended.
 
 ## 3.3.6
