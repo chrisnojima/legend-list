@@ -210,12 +210,17 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
     // passive effects within one component in declaration order, so this ordering is load-bearing
     // — do not reorder these two effects.
     //
-    // Gated on flags.guardedDeleteImperativeScroll (variant I only): every other variant must be
-    // byte-identical to what it was before variant I existed, so A/B/C/D/E/F/G/H's committed
-    // results stay comparisons against the same build, not a build that happens to carry one more
-    // passive effect on every commit. This effect is also the leading (unconfirmed) suspect for
-    // I's hit-then-end-anchor regression, which makes leaving it ungated for non-I variants
-    // actively misleading, not just imprecise.
+    // Gated on flags.guardedDeleteImperativeScroll (variant I only). This makes the effect
+    // BEHAVIORALLY INERT for every other variant — the callback still fires (and is still
+    // scheduled) on every ready/messages change, it just returns before touching anything — not
+    // byte-identical to a build where the effect doesn't exist at all. The gate's cost is assumed
+    // negligible for A/B/C/D/E/F/G/H, not proven negligible: round 4 hypothesized this same
+    // effect's presence as the leading (unconfirmed) suspect for variant I's hit-then-end-anchor
+    // regression, and round 5 found variant H — whose own decision logic never reads this ref —
+    // shows the identical failure signature on the current (gated) build. That is evidence AGAINST
+    // this effect being the sole or even primary cause, not for it; see repro/API-AUDIT.md's
+    // "hit-then-end-anchor" section for the full, still-unresolved picture. Do not treat "gated"
+    // as "proven harmless" for the other variants.
     React.useEffect(() => {
         if (!flags.guardedDeleteImperativeScroll) {
             return;
