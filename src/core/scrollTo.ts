@@ -3,9 +3,11 @@ import { cancelScrollCompletionChecks } from "@/core/cancelImperativeScroll";
 import { clampScrollOffset } from "@/core/clampScrollOffset";
 import { doScrollTo } from "@/core/doScrollTo";
 import { initialScrollCompletion, initialScrollWatchdog } from "@/core/initialScrollSession";
+import { clearScrollTargetAnchor } from "@/core/scrollTargetAnchor";
 import { updateScroll } from "@/core/updateScroll";
 import { Platform } from "@/platform/Platform";
 import type { StateContext } from "@/state/state";
+import { getId } from "@/utils/getId";
 import { getItemSizeAtIndex } from "@/utils/getItemSize";
 
 type InternalScrollTarget = NonNullable<StateContext["state"]["scrollingTo"]>;
@@ -53,6 +55,13 @@ function syncInitialScrollNativeWatchdog(
     if (shouldClearInitialNativeScrollWatchdog) {
         initialScrollWatchdog.clear(state);
     }
+}
+
+function getScrollTargetKey(state: StateContext["state"], index: number | undefined) {
+    if (index === undefined || index < 0 || index >= state.props.data.length) {
+        return undefined;
+    }
+    return getId(state, index);
 }
 
 function findPositionIndexAtOrBeforeOffset(ctx: StateContext, offset: number) {
@@ -185,13 +194,19 @@ export function scrollTo(
 
     // noScrollingTo is used for the workaround in mvcp to fake it with scroll
     if (!noScrollingTo) {
+        // A new request owns the position, and will leave its own anchor behind when it finishes.
+        clearScrollTargetAnchor(state);
         if (isInitialScroll) {
             initialScrollCompletion.resetFlags(state);
         }
         const averageSizeSnapshot = getAverageSizeSnapshot(state);
+        // Remember which item the index referred to. Data can move that item before the scroll
+        // completes, and the key is the only part of the request that survives an index shift.
+        const targetKey = getScrollTargetKey(state, scrollTarget.index);
         state.scrollingTo = {
             ...scrollTarget,
             ...(averageSizeSnapshot ? { averageSizeSnapshot } : {}),
+            ...(targetKey !== undefined ? { key: targetKey } : {}),
             targetOffset,
             waitForInitialScrollCompletionFrame,
         };

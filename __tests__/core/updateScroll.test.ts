@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, spyOn } from "bun:test";
 import "../setup"; // Import global test setup
 
 import * as doMaintainScrollAtEndModule from "@/core/doMaintainScrollAtEnd";
+import { markImperativeScrollSettling } from "@/core/imperativeScrollSettle";
 import { updateScroll } from "@/core/updateScroll";
 import * as flushSyncModule from "@/platform/flushSync";
 import { Platform } from "@/platform/Platform";
@@ -76,6 +77,44 @@ describe("updateScroll large user jumps", () => {
         } finally {
             globalThis.cancelAnimationFrame = originalCancelAnimationFrame;
         }
+    });
+
+    it("does not reset MVCP anchoring state for the landing event of a scroll that just finished", () => {
+        // The scroller reports a jump on its own schedule, so its landing event can outlive
+        // state.scrollingTo. Reading that as a reader taking over throws away anchors, and any
+        // programmatic scroll longer than the viewport produces exactly this event.
+        Platform.OS = "ios";
+        const anchorLock = {
+            expiresAt: Date.now() + 500,
+            id: "item_0",
+            position: 0,
+            quietPasses: 0,
+        };
+        mockCtx.state.mvcpAnchorLock = anchorLock;
+        markImperativeScrollSettling(mockCtx.state);
+
+        updateScroll(mockCtx, 150, undefined, { fromNativeScrollEvent: true });
+
+        expect(flushSyncSpy).not.toHaveBeenCalled();
+        expect(mockCtx.state.mvcpAnchorLock).toBe(anchorLock);
+        expect(mockCtx.state.userScrollAnchorReset).toBeUndefined();
+    });
+
+    it("resets MVCP anchoring state again once the settling window has passed", () => {
+        Platform.OS = "ios";
+        mockCtx.state.mvcpAnchorLock = {
+            expiresAt: Date.now() + 500,
+            id: "item_0",
+            position: 0,
+            quietPasses: 0,
+        };
+        markImperativeScrollSettling(mockCtx.state);
+        mockCtx.state.imperativeScrollSettlingUntil = Date.now() - 1;
+
+        updateScroll(mockCtx, 150, undefined, { fromNativeScrollEvent: true });
+
+        expect(mockCtx.state.mvcpAnchorLock).toBeUndefined();
+        expect(mockCtx.state.userScrollAnchorReset?.keys).toEqual(new Set());
     });
 
     it("does not reset MVCP anchoring state for large programmatic scroll jumps", () => {

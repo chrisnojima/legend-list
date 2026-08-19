@@ -28,12 +28,14 @@ import { doInitialAllocateContainers } from "@/core/doInitialAllocateContainers"
 import { finishMaintainScrollAtEnd } from "@/core/doMaintainScrollAtEnd";
 import { clearPreservedInitialScrollTarget } from "@/core/finishInitialScroll";
 import { handleLayout } from "@/core/handleLayout";
+import { clearImperativeScrollSettling } from "@/core/imperativeScrollSettle";
 import { advanceCurrentInitialScrollSession, resolveInitialScrollOffset } from "@/core/initialScroll";
 import { handleInitialScrollDataChange, initializeInitialScrollOnMount } from "@/core/initialScrollLifecycle";
 import { onScroll } from "@/core/onScroll";
 import { resetLayoutCachesForDataChange } from "@/core/resetLayoutCachesForDataChange";
 import { ScheduledWork } from "@/core/ScheduledWork";
 import { ScrollAdjustHandler } from "@/core/ScrollAdjustHandler";
+import { clearScrollTargetAnchor } from "@/core/scrollTargetAnchor";
 import { scrollToEnd } from "@/core/scrollToEnd";
 import { maybeUpdateAnchoredEndSpace } from "@/core/updateAnchoredEndSpace";
 import { updateContentInsetEndAdjustment } from "@/core/updateContentInsetEndAdjustment";
@@ -851,6 +853,14 @@ const LegendListInner = typedForwardRef(function LegendListInner<T>(
             onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => onScroll(ctx, event),
             onScrollBeginDrag: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
                 const maintainingScrollAtEnd = state.maintainingScrollAtEnd;
+                // A touch takes the list away from where the request aimed it. The request still
+                // owns completion, but it must stop re-aiming or it drags the reader back.
+                if (state.scrollingTo && !state.scrollingTo.isInitialScroll) {
+                    state.scrollingTo.userInterrupted = true;
+                }
+                clearScrollTargetAnchor(state);
+                // A touch is a real gesture, so anything large that follows it is the reader's.
+                clearImperativeScrollSettling(state);
                 if (maintainingScrollAtEnd === "animated" || maintainingScrollAtEnd === "instant") {
                     cancelImperativeScroll(state);
                 }

@@ -18,6 +18,7 @@ import FixedSizeItemsExample from "./FixedSizeItemsExample";
 import HeaderMvcpExample from "./HeaderMvcpExample";
 import InitialScrollAtEndExample from "./InitialScrollAtEndExample";
 import InitialScrollIndexExample from "./InitialScrollIndexExample";
+import JumpToIndexSettleExample from "./JumpToIndexSettleExample";
 import LazyListExample from "./LazyListExample";
 import MutableCellsExample from "./MutableCellsExample";
 import MVCPTestExample from "./MVCPTestExample";
@@ -125,6 +126,13 @@ export const FIXTURE_ROUTES: FixtureRoute[] = [
         group: "Scroll & Position",
         path: "initial-scroll-index",
         title: "Initial Scroll Index",
+    },
+    {
+        description: "Centres a far-away row on rows much taller than their estimate, and reports the landing error.",
+        element: () => <JumpToIndexSettleExample />,
+        group: "Scroll & Position",
+        path: "jump-to-index-settle",
+        title: "Jump To Index Settle",
     },
     {
         description: "Starts at the end of the list and checks bottom-aligned landing behavior.",
