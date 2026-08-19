@@ -180,13 +180,18 @@ export const SCENARIOS: Scenario[] = [
             await openAtHit(ctx, { partialFirst: false });
             await ctx.wait(300);
             ctx.setCentered(undefined);
-            // bumpDataset() here, same as openAtHit always does on its own clear+recenter: the
-            // swap below replaces the ~480-520 hit window with a disjoint ~861-900 window, so
-            // maintainVisibleContentPosition needs the same "this is a new dataset, not a
-            // continuation" signal any other full-window swap gets. Omitting this was a bug in an
-            // earlier version of this scenario — it handed the list an unrelated dataset under an
-            // unchanged dataKey, a plausible cause of failure sitting underneath this scenario's
-            // result on its own, independent of whichever variant is under test.
+            // bumpDataset() here for the same reason openAtHit always calls it: the swap below
+            // replaces the ~480-520 hit window with a disjoint ~861-900 window, so
+            // maintainVisibleContentPosition needs the "this is a new dataset, not a
+            // continuation" signal any full-window swap gets. The sequence is NOT identical to
+            // openAtHit's, though — openAtHit clears to [] and flaps ready false->true around its
+            // reload; this transition doesn't (the list stays ready and non-empty the whole time,
+            // since it's returning to a live end-anchored view, not opening a fresh centered
+            // load), so don't read this as full parity with openAtHit, just the same bumpDataset()
+            // signal for the same reason. Omitting it was a bug in an earlier version of this
+            // scenario — it handed the list an unrelated dataset under an unchanged dataKey, a
+            // plausible cause of failure sitting underneath this scenario's result on its own,
+            // independent of whichever variant is under test.
             ctx.bumpDataset();
             ctx.setMessages(await ctx.backend.loadOlder(SEND_WINDOW_NEWEST_ID + 1, PAGE));
             ctx.setReady(true);

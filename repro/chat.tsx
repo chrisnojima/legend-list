@@ -209,11 +209,21 @@ export const Chat = React.forwardRef<ChatHandle, ChatProps>(function ChatCompone
     // must not retroactively count as "already live" for that commit's own decision. React runs
     // passive effects within one component in declaration order, so this ordering is load-bearing
     // — do not reorder these two effects.
+    //
+    // Gated on flags.guardedDeleteImperativeScroll (variant I only): every other variant must be
+    // byte-identical to what it was before variant I existed, so A/B/C/D/E/F/G/H's committed
+    // results stay comparisons against the same build, not a build that happens to carry one more
+    // passive effect on every commit. This effect is also the leading (unconfirmed) suspect for
+    // I's hit-then-end-anchor regression, which makes leaving it ungated for non-I variants
+    // actively misleading, not just imprecise.
     React.useEffect(() => {
+        if (!flags.guardedDeleteImperativeScroll) {
+            return;
+        }
         if (ready && messages.length > 0) {
             hasRenderedNonEmptyRef.current = true;
         }
-    }, [messages, ready]);
+    }, [flags.guardedDeleteImperativeScroll, messages, ready]);
 
     const renderItem = React.useCallback(
         ({ item }: { item: number }) => {
